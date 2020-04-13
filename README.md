@@ -3,8 +3,7 @@
 2. Attibute based encryption (Under Client Android project)
 ## Steps run the demo(ABE):
 
-### Prerequisite:
-#### Android NDK: 
+### Prerequisite: Android NDK
 ##### Android Studio -> Project Structure -> Sdk Location 
 ##### Download the the NDK and set the NDK path in local.property file of Client project
 
