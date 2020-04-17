@@ -1,6 +1,7 @@
 package com.example.client;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
 
     TextView textResponse, url, entertex,disp_info;
     EditText editTextAddress, editTextPort;
-    Button buttonConnect, buttonClear, enc_button, dec_button, dec_button2;
+    Button buttonConnect, buttonClear, enc_button, dec_button, dec_button2, go_button;
     EditText welcomeMsg;
 
     //Encryption Vars
@@ -65,6 +66,7 @@ public class MainActivity extends Activity {
         dec_button2 = (Button) findViewById(R.id.dec_button2);
 
         entertex = (EditText) findViewById(R.id.entertex);
+        go_button = (Button) findViewById(R.id.go_button);
 
         //for displaying results
         disp_info = (TextView) findViewById(R.id.disp_info); disp_info.setText("(school:pku & academy:computer) || (location:bj  & age:130)");
@@ -143,7 +145,16 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        //start the new activity
+        go_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, Main2Activity.class));
+            }
+        });
+
     }
+
 
     OnClickListener buttonConnectOnClickListener = new OnClickListener() {
         @Override

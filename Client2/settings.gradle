@@ -1,0 +1,3 @@
+rootProject.name='Client2'
+include ':app'
+include ':abe_lib'

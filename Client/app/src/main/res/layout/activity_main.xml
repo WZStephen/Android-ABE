@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:autoLink="web"
-            android:text="Android-ABE"
+            android:text="Android-ABE-Vontroy"
             android:textStyle="bold" />
         <EditText
             android:id="@+id/welcomemsg"
@@ -79,6 +79,12 @@
             android:layout_height="wrap_content"
             android:textAllCaps="false"
             android:text='Key#2: {"school:pku", "academy:biology"}' />
+
+        <Button
+            android:id="@+id/go_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go Next" />
 
         <TextView
             android:id="@+id/response"
