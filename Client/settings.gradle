@@ -1,3 +1,4 @@
 rootProject.name='Client'
 include ':app'
 include ':abe_lib'
+include ':abe_lib_bsw'
