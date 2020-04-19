@@ -1,4 +1,4 @@
-package com.cpabe.abe_lib_bsw;
+package com.cpabe.abe_lib.bsw;
 
 import java.util.ArrayList;
 

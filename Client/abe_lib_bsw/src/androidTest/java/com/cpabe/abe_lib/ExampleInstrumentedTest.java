@@ -1,4 +1,4 @@
-package com.cpabe.abe_lib_bsw;
+package com.cpabe.abe_lib;
 
 import android.content.Context;
 

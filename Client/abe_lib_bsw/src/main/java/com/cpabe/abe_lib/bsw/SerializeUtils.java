@@ -1,4 +1,4 @@
-package com.cpabe.abe_lib_bsw;
+package com.cpabe.abe_lib.bsw;
 
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Element;
