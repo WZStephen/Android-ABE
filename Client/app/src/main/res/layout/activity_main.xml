@@ -47,6 +47,12 @@
             android:layout_height="wrap_content"
             android:text="Clear"/>
 
+        <TextView
+            android:id="@+id/global_attr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Private Keys: ta1.sk; ta2:sk; ta3:sk" />
+
         <EditText
             android:id="@+id/entertex"
             android:layout_width="match_parent"
@@ -55,36 +61,32 @@
             android:hint="Enter Text to Encrypt"
             android:inputType="textPersonName" />
 
-        <TextView
-            android:id="@+id/disp_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <Button
             android:id="@+id/enc_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Encrypt" />
 
-        <Button
-            android:id="@+id/enc_button2"
+        <TextView
+            android:id="@+id/disp_sk"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Encrypt2" />
+            android:text="Private Keys: ta1.sk; ta2:sk; ta3:sk" />
+
+        <EditText
+            android:id="@+id/get_priv_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Enter Private Key Name"
+            android:inputType="textPersonName" />
 
         <Button
             android:id="@+id/dec_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text='Key#1: {"school:pku", "academy:computer"}' />
-
-        <Button
-            android:id="@+id/dec_button2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAllCaps="false"
-            android:text='Key#2: {"school:pku", "academy:biology"}' />
+            android:text="DECRYPT"
+            android:textAllCaps="false" />
 
         <Button
             android:id="@+id/go_button"

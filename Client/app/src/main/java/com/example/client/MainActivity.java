@@ -21,31 +21,26 @@ import java.net.UnknownHostException;
 
 //import abe lib
 
-import com.cpabe.abe_lib.bsw.*;
+import com.cpabe.abe_lib.bsw.Bswabe;
 import com.cpabe.abe_lib.cpabe.*;
 
 public class MainActivity extends Activity {
 
-    TextView textResponse, url, entertex,disp_info;
+    TextView textResponse, url, entertex, disp_info, get_priv_key_name;
     EditText editTextAddress, editTextPort;
-    Button buttonConnect, buttonClear, enc_button,enc_button2, dec_button, dec_button2, go_button;
+    Button buttonConnect, buttonClear, enc_button, dec_button;
     EditText welcomeMsg;
 
     //Encryption Vars
-    String flag_enc = "False";
-    String flag_dec = "False";
-    String flag_dec2 = "False";
-
-    static String pubfile;
-    static String pubfile2;
-
-    static String mskfile;
-    static String mskfile2;
-
-    static String prvfile;
-    static String prvfile2;
+    Cpabe cpabe = new Cpabe();
 
     static String inputfile;
+    static String pubfile;
+    static String pubfile2;
+    static String mskfile;
+    static String mskfile2;
+    static String prvfile;
+    static String prvfile2;
     static String encfile;
     static String decfile;
 
@@ -65,16 +60,15 @@ public class MainActivity extends Activity {
 
         //for ABE encrpt message
         enc_button = (Button) findViewById(R.id.enc_button);
-        enc_button2 = (Button) findViewById(R.id.enc_button2);
-
         dec_button = (Button) findViewById(R.id.dec_button);
-        dec_button2 = (Button) findViewById(R.id.dec_button2);
-
         entertex = (EditText) findViewById(R.id.entertex);
-        go_button = (Button) findViewById(R.id.go_button);
+        get_priv_key_name = (EditText) findViewById(R.id.get_priv_key);
 
         //for displaying results
-        disp_info = (TextView) findViewById(R.id.disp_info); disp_info.setText("(school:pku & academy:computer) || (location:bj  & age:130)");
+        disp_info = (TextView) findViewById(R.id.global_attr);
+        disp_info.setText("ta:ta1, ta:ta2, ta:ta3\n"
+                + "attr:1, attr:2, attr:3 attr:4, attr:5\n"
+                + "attr:6, attr:7, attr:8, attr:9, attr:10");
         textResponse = (TextView) findViewById(R.id.response);
 
         //connect button handler
@@ -119,17 +113,13 @@ public class MainActivity extends Activity {
                     writer.flush();
                     writer.close();
                     //开始进行加密
-                    flag_enc = abe_encrypted();
-                    textResponse.setText(flag_enc);
-                    abe_encrypted2();
-                    textResponse.setText("second key generated");
+                    textResponse.setText(abe_encrypted());
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
-
 
         //decrypt button handler
         dec_button.setOnClickListener(new View.OnClickListener(){
@@ -137,53 +127,90 @@ public class MainActivity extends Activity {
             public void onClick(View v){
                 try {
                     //开始进行解密
-                    flag_dec = abe_decrypt();
-                    if(flag_dec.equals("Decryption Operates Successfully!")){
-                        Toast.makeText(MainActivity.this, flag_dec, Toast.LENGTH_LONG).show();
+                    boolean flag_dec;
+                    flag_dec = abe_decrypt(get_priv_key_name.getText().toString());
+                    if(flag_dec){
+                        Toast.makeText(MainActivity.this, "Decryption Operates Successfully!", Toast.LENGTH_LONG).show();
                         textResponse.setText(readFile("FILE_DECRYPTED/input.txt.new"));
                         //deletefile("FILE_ENCRYPTED/Dec_tmp.txt");
                     } else {
-                        Toast.makeText(MainActivity.this, flag_dec + "Wrong Secret Key", Toast.LENGTH_LONG).show();
-                        textResponse.setText("Decrypted File does not exist");
+                        Toast.makeText(MainActivity.this, flag_dec + "Decrypted File does not exist", Toast.LENGTH_LONG).show();
+                        textResponse.setText("Wrong Secret Key");
                     }
                 } catch (Exception e) {
-                    textResponse.setText("Wrong Secret Key or Error");
+                    textResponse.setText("There is Exception");
                     e.printStackTrace();
                 }
             }
         });
-
-        //decrypt button handler2
-        dec_button2.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                try {
-                    flag_dec2 = abe_decrypt2();
-                    if(flag_dec2.equals("Decryption Operates Successfully!")){
-                        Toast.makeText(MainActivity.this, flag_dec2, Toast.LENGTH_LONG).show();
-                        textResponse.setText(readFile("FILE_DECRYPTED/input.txt.new"));
-                        //deletefile("FILE_ENCRYPTED/Dec_tmp.txt");
-                    } else {
-                        Toast.makeText(MainActivity.this, flag_dec2 + "Wrong Secret Key", Toast.LENGTH_LONG).show();
-                        textResponse.setText("Decrypted File does not exist");
-                    }
-                } catch (Exception e) {
-                    textResponse.setText("Wrong Secret Key or Error");
-                    e.printStackTrace();
-                }
-            }
-        });
-        //start the new activity
-        go_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //startActivity(new Intent(MainActivity.this, Main2Activity.class));
-            }
-        });
-
     }
 
-    //Communication method
+    //ABE encrypt method
+    private String abe_encrypted () throws Exception{
+        //待加密文件路径
+        inputfile = MainActivity.this.getFilesDir() + "/FILE_TO_BE_ENC/input.txt";
+
+        //密钥存储路径
+        pubfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
+        pubfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta2.pk";
+        mskfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta1.msk";
+        mskfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta2.msk";
+
+        prvfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1.sk";
+        prvfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta2.sk";
+
+        //加密解密文件存储路径
+        encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
+        decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
+
+        //设置全球公钥属性
+        String attribute = "ta:ta1 ta:ta2 ta:ta3 "
+                + "attr:1 attr:2 attr:3 attr:4 attr:5 "
+                + "attr:6 attr:7 attr:8 attr:9 attr:10";
+
+        //设置私钥属性和加密策略
+        String policy = "attr:1 attr:2 attr:3 3of3";
+
+        //生成密钥文件
+        cpabe.setup(pubfile, mskfile);
+        //cpabe.setup(pubfile2, mskfile2);
+
+        //生成公钥和对应密钥
+        cpabe.keygen(pubfile, prvfile, mskfile, attribute);
+        cpabe.keygen(pubfile, prvfile2, mskfile, attribute);
+
+        //委派
+        //cpabe.delegate(pubfile, prvfile, "attr:11 attr:12 attr:13");
+
+        //加密
+        cpabe.enc(pubfile, policy, inputfile, encfile);
+
+        return "ABE Encrypt success, encrypted file is stored at \n" + encfile +
+                "\n\n The attribute is \n" + attribute +
+                "\n\n The policy is \n" + policy +
+                "\n\n Three Keys Stored " +
+                "\n\n Public_key: \n" + pubfile +
+                "\n\n Master key: \n" + mskfile +
+                "\n\n Private Key#1 \n" + prvfile;
+    }
+
+    //ABE decrypt method
+    private boolean abe_decrypt (String priv_key_name) throws Exception{
+        pubfile = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
+        prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/" + priv_key_name;
+
+        encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
+        decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
+
+        //解密
+        boolean flag_dec = cpabe.dec(pubfile, prvfile, encfile, decfile);
+        if (flag_dec)
+            return true;
+        return false;
+    }
+
+    /*------------------------Utilities------------------------------------*/
+    //communication method
     public class MyClientTask extends AsyncTask<Void, Void, Void> {
         String dstAddress;
         int dstPort;
@@ -254,98 +281,7 @@ public class MainActivity extends Activity {
         }
     }
 
-
-    //ABE encrypt method
-    private String abe_encrypted () throws Exception{
-        //创建两组不同的公钥和密钥
-        pubfile = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/pub_key";
-        mskfile = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/master_key";
-        prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_key/prv_key";
-
-
-        //用第一组公钥和密钥进行加密
-        inputfile = MainActivity.this.getFilesDir() + "/FILE_TO_BE_ENC/input.txt";
-        encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
-        decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
-
-        //设置总公钥属性
-        String student_attr = "objectClass:inetOrgPerson objectClass:organizationalPerson "
-                + "sn:student2 cn:student2 uid:student2 userPassword:student2 "
-                + "ou:idp o:computer mail:student2@sdu.edu.cn title:student";
-
-
-        //设置私钥属性和加密策略
-        String student_policy = "sn:student2 cn:student2 uid:student2 3of3";
-
-        //初始化
-        Cpabe cpabe = new Cpabe();
-        cpabe.setup(pubfile, mskfile);
-
-        //生成公钥和对应密钥
-        cpabe.keygen(pubfile, prvfile, mskfile, student_attr);
-
-        //加密
-        cpabe.enc(pubfile, student_policy, inputfile, encfile);
-
-        return "ABE Encrypt success, encrypted file is stored at \n" + encfile +
-                "\n\n The attribute is \n" + student_attr +
-                "\n\n The policy is \n" + student_policy +
-                "\n\n Three Keys Stored " +
-                "\n\n Public_key: \n" + pubfile +
-                "\n\n Master key: \n" + mskfile +
-                "\n\n Private Key#1 \n" + prvfile;
-    }
-
-    private String abe_encrypted2 () throws Exception{
-        pubfile2 = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/pub_key2";
-        mskfile2 = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/master_key2";
-        prvfile2 = MainActivity.this.getFilesDir() + "/BSW_ENV/private_key2/prv_key";
-
-        //设置私钥属性和加密策略
-        String student_attr2 = "asu:student3 uw:student3";
-        //初始化
-        Cpabe cpabe = new Cpabe();
-        cpabe.setup(pubfile2, mskfile2);
-
-        //生成公钥和对应密钥
-        cpabe.keygen(pubfile2, prvfile2, mskfile2, student_attr2);
-        return "Testing bed";
-    }
-    //ABE decrypt method
-    private String abe_decrypt () throws Exception{
-        pubfile = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/pub_key";
-        prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_key/prv_key";
-        //prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_key2/prv_key";
-        encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
-        decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
-
-        //解密
-        Cpabe cpabe = new Cpabe();
-        boolean flag_dec = cpabe.dec(pubfile, prvfile, encfile, decfile);
-        if (flag_dec == true){
-            return "Decryption Operates Successfully!";
-        }
-        return "Decryption Unsuccessful, Wrong secret key";
-    }
-
-    //ABE decrypt method
-    private String abe_decrypt2 () throws Exception{
-        pubfile = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/pub_key";
-        //prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_key/prv_key";
-        prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_key2/prv_key";
-        encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
-        decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
-
-        //解密
-        Cpabe cpabe = new Cpabe();
-        boolean flag_dec = cpabe.dec(pubfile, prvfile, encfile, decfile);
-        if (flag_dec == true){
-            return "Decryption Operates Successfully!";
-        }
-        return "Decryption Unsuccessful, Wrong secret key";
-    }
-
-    //File reader
+    //file reader
     private String readFile(String filepath) {
         File fileEvents = new File(MainActivity.this.getFilesDir() + "/" + filepath);
         StringBuilder text = new StringBuilder();
@@ -367,8 +303,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    //File deleter
-    private boolean deletefile(String filepath){
+    //file deleter
+    private boolean deleteile(String filepath){
         File fileEvents = new File(MainActivity.this.getFilesDir() + "/" + filepath);
         if(fileEvents.delete()){
             return true;

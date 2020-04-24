@@ -18,7 +18,6 @@ public class Bswabe {
 	/*
 	 * Generate a public key and corresponding master secret key.
 	 */
-
 	private static String curveParams = "type a\n"
 			+ "q 87807107996633125224377819847540498158068831994142082"
 			+ "1102865339926647563088022295707862517942266222142315585"
@@ -144,6 +143,7 @@ public class Bswabe {
             /* compute */
             rt.setToRandom();
             f_at_rt = pub.f.duplicate();
+
             f_at_rt.powZn(rt);
             prv.d = prv_src.d.duplicate();
             prv.d.mul(f_at_rt);
@@ -265,8 +265,7 @@ public class Bswabe {
 	 * Returns true if decryption succeeded, false if this key does not satisfy
 	 * the policy of the ciphertext (in which case m is unaltered).
 	 */
-	public static BswabeElementBoolean dec(BswabePub pub, BswabePrv prv,
-			BswabeCph cph) {
+	public static BswabeElementBoolean dec(BswabePub pub, BswabePrv prv, BswabeCph cph) {
 		Element t;
 		Element m;
 		BswabeElementBoolean beb = new BswabeElementBoolean();
@@ -300,8 +299,7 @@ public class Bswabe {
 		return beb;
 	}
 
-	private static void decFlatten(Element r, BswabePolicy p, BswabePrv prv,
-			BswabePub pub) {
+	private static void decFlatten(Element r, BswabePolicy p, BswabePrv prv, BswabePub pub) {
 		Element one;
 		one = pub.p.getZr().newElement();
 		one.setToOne();
@@ -310,16 +308,14 @@ public class Bswabe {
 		decNodeFlatten(r, one, p, prv, pub);
 	}
 
-	private static void decNodeFlatten(Element r, Element exp, BswabePolicy p,
-			BswabePrv prv, BswabePub pub) {
+	private static void decNodeFlatten(Element r, Element exp, BswabePolicy p, BswabePrv prv, BswabePub pub) {
 		if (p.children == null || p.children.length == 0)
 			decLeafFlatten(r, exp, p, prv, pub);
 		else
 			decInternalFlatten(r, exp, p, prv, pub);
 	}
 
-	private static void decLeafFlatten(Element r, Element exp, BswabePolicy p,
-			BswabePrv prv, BswabePub pub) {
+	private static void decLeafFlatten(Element r, Element exp, BswabePolicy p, BswabePrv prv, BswabePub pub) {
 		BswabePrvComp c;
 		Element s, t;
 
@@ -337,8 +333,7 @@ public class Bswabe {
 		r.mul(s); /* num_muls++; */
 	}
 
-	private static void decInternalFlatten(Element r, Element exp,
-			BswabePolicy p, BswabePrv prv, BswabePub pub) {
+	private static void decInternalFlatten(Element r, Element exp, BswabePolicy p, BswabePrv prv, BswabePub pub) {
 		int i;
 		Element t, expnew;
 

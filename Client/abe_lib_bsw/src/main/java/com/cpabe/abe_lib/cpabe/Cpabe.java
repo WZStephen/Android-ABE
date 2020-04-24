@@ -21,12 +21,21 @@ public class Cpabe {
 	 * @author Junwei Wang(wakemecn@gmail.com)
 	 */
 
+	BswabePub pub_tmp;
+	BswabePrv prv_tmp;
+
 	public void setup(String pubfile, String mskfile) throws IOException,
 			ClassNotFoundException {
 		byte[] pub_byte, msk_byte;
 		BswabePub pub = new BswabePub();
 		BswabeMsk msk = new BswabeMsk();
 		Bswabe.setup(pub, msk);
+
+		//保存pub用来delegate
+		pub_tmp = pub;
+
+//		String[] attr_subset = {"attr:11", "attr:12", "attr:13"}
+//		Bswabe.delegate(pub, msk, attr_subset);
 
 		/* store BswabePub into mskfile */
 		pub_byte = SerializeUtils.serializeBswabePub(pub);
@@ -52,6 +61,9 @@ public class Cpabe {
 
 		String[] attr_arr = LangPolicy.parseAttribute(attr_str);
 		BswabePrv prv = Bswabe.keygen(pub, msk, attr_arr);
+
+		//保存prv用来delegate
+		prv_tmp = prv;
 
 		/* store BswabePrv into prvfile */
 		prv_byte = SerializeUtils.serializeBswabePrv(prv);
@@ -128,5 +140,22 @@ public class Cpabe {
 			return false;
 		}
 	}
+	public void delegate(String pubfile, String prvfile, String attr_subset) throws Exception {
+		byte[] prv_byte;
+		byte[] pub_byte;
+		BswabePrv prv;
+		BswabePub pub;
 
+		/* get BswabePub from pubfile */
+		pub_byte = Common.suckFile(pubfile);
+		pub = SerializeUtils.unserializeBswabePub(pub_byte);
+
+		/* get BswabePrv form prvfile */
+		prv_byte = Common.suckFile(prvfile);
+		prv = SerializeUtils.unserializeBswabePrv(pub, prv_byte);
+
+		String[] attr_arr = LangPolicy.parseAttribute(attr_subset);
+		Bswabe.delegate(pub_tmp, prv_tmp, attr_arr);
+
+	}
 }
