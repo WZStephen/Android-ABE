@@ -1,4 +1,4 @@
-package com.example.client;
+package com.example.abe_lib;
 
 import org.junit.Test;
 

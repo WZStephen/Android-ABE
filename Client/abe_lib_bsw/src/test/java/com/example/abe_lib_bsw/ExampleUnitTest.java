@@ -1,4 +1,4 @@
-package com.cpabe.abe_lib;
+package com.example.abe_lib_bsw;
 
 import org.junit.Test;
 

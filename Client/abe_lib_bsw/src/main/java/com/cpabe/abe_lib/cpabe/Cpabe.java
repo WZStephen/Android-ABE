@@ -1,9 +1,4 @@
 package com.cpabe.abe_lib.cpabe;
-import com.cpabe.abe_lib.cpabe.policy.LangPolicy;
-import it.unisa.dia.gas.jpbc.Element;
-
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 import com.cpabe.abe_lib.bsw.Bswabe;
 import com.cpabe.abe_lib.bsw.BswabeCph;
@@ -13,6 +8,12 @@ import com.cpabe.abe_lib.bsw.BswabeMsk;
 import com.cpabe.abe_lib.bsw.BswabePrv;
 import com.cpabe.abe_lib.bsw.BswabePub;
 import com.cpabe.abe_lib.bsw.SerializeUtils;
+import com.cpabe.abe_lib.cpabe.policy.LangPolicy;
+
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+
+import it.unisa.dia.gas.jpbc.Element;
 
 public class Cpabe {
 

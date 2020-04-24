@@ -1,13 +1,13 @@
 package com.cpabe.abe_lib.bsw;
 
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.DefaultCurveParameters;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 
 public class SerializeUtils {
 

@@ -10,8 +10,6 @@ import com.vontroy.abe_lib.component.Traceable;
 import com.vontroy.abe_lib.utils.PairingManager;
 import com.vontroy.abe_lib.utils.Utils;
 
-import it.unisa.dia.gas.jpbc.Element;
-import it.unisa.dia.gas.jpbc.Pairing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +17,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Pairing;
 
 //import utils.SymmetricEncryption;
 

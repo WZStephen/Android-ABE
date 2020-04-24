@@ -1,4 +1,4 @@
-package com.cpabe.abe_lib;
+package com.example.abe_lib;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.cpabe.abe_lib_bsw.test", appContext.getPackageName());
+        assertEquals("com.example.abe_lib.test", appContext.getPackageName());
     }
 }

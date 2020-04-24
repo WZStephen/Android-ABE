@@ -73,19 +73,19 @@ public class MainActivity extends Activity {
 
         //connect button handler
         buttonConnect.setOnClickListener(new View.OnClickListener(){
-             @Override
-             public void onClick(View v) {
-                 String tMsg = welcomeMsg.getText().toString();
-                 if(tMsg.equals("")){
-                     tMsg = null;
-                     Toast.makeText(MainActivity.this, "No Welcome Msg sent", Toast.LENGTH_SHORT).show();
-                 }
-                 MyClientTask myClientTask = new MyClientTask(editTextAddress
-                         .getText().toString(), Integer.parseInt(editTextPort
-                         .getText().toString()),
-                         tMsg);
-                 myClientTask.execute();
-             }
+            @Override
+            public void onClick(View v) {
+                String tMsg = welcomeMsg.getText().toString();
+                if(tMsg.equals("")){
+                    tMsg = null;
+                    Toast.makeText(MainActivity.this, "No Welcome Msg sent", Toast.LENGTH_SHORT).show();
+                }
+                MyClientTask myClientTask = new MyClientTask(editTextAddress
+                        .getText().toString(), Integer.parseInt(editTextPort
+                        .getText().toString()),
+                        tMsg);
+                myClientTask.execute();
+            }
         });
 
         buttonClear.setOnClickListener(new OnClickListener() {

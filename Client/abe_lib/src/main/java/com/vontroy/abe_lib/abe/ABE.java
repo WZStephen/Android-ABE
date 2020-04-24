@@ -36,5 +36,5 @@ public interface ABE {
      * @return if secret key satisfies the policy in ciphertext, then return the decrypted
      * load of the ciphertext, otherwise return null
      */
-    byte[] decrypt(Ciphertext ciphertext , Key secretKey);
+    byte[] decrypt(Ciphertext ciphertext, Key secretKey);
 }
