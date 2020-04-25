@@ -22,6 +22,9 @@ import java.net.UnknownHostException;
 //import abe lib
 
 import com.cpabe.abe_lib.bsw.Bswabe;
+import com.cpabe.abe_lib.bsw.BswabeMsk;
+import com.cpabe.abe_lib.bsw.BswabePrv;
+import com.cpabe.abe_lib.bsw.BswabePub;
 import com.cpabe.abe_lib.cpabe.*;
 
 public class MainActivity extends Activity {
@@ -170,20 +173,23 @@ public class MainActivity extends Activity {
 
         //设置私钥属性和加密策略
         String policy = "attr:1 attr:2 attr:3 3of3";
+        String policy2 = "attr:1 attr:2 attr:3 ta:ta1 ta:ta2 5of5";
 
         //生成密钥文件
         cpabe.setup(pubfile, mskfile);
         //cpabe.setup(pubfile2, mskfile2);
 
-        //生成公钥和对应密钥
+        //生成公钥和对应密钥1
         cpabe.keygen(pubfile, prvfile, mskfile, attribute);
+
+        //委派密钥1(添加子集)
+        //cpabe.delegate(pubfile, prvfile, "ta:ta1 ta:ta3");
+
+        //生成公钥和对应密钥2
         cpabe.keygen(pubfile, prvfile2, mskfile, attribute);
 
-        //委派
-        //cpabe.delegate(pubfile, prvfile, "attr:11 attr:12 attr:13");
-
         //加密
-        cpabe.enc(pubfile, policy, inputfile, encfile);
+        cpabe.enc(pubfile, policy2, inputfile, encfile);
 
         return "ABE Encrypt success, encrypted file is stored at \n" + encfile +
                 "\n\n The attribute is \n" + attribute +

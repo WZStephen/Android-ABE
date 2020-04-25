@@ -165,7 +165,7 @@ public class Bswabe {
                 boolean comp_src_init = false;
 
                 for (int j = 0; j < prv_src.comps.size(); ++j) {
-                    if (prv_src.comps.get(j).attr == comp.attr) {
+                    if (prv_src.comps.get(j).attr.equals(comp.attr) ) {
                         comp_src = prv_src.comps.get(j);
                         comp_src_init = true;
                         break;

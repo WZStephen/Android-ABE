@@ -71,6 +71,27 @@ public class Cpabe {
 		Common.spitFile(prvfile, prv_byte);
 	}
 
+	public void  delegate(String pubfile, String prvfile, String attr_subset) throws Exception {
+
+		BswabePrv prv_delegate;
+//		BswabePub pub;
+//
+//		/* get BswabePub from pubfile */
+//		byte[] pub_byte = Common.suckFile(pubfile);
+//		pub = SerializeUtils.unserializeBswabePub(pub_byte);
+//
+//		/* get BswabePrv form prvfile */
+//		byte[] prv_byte = Common.suckFile(prvfile);
+//		prv = SerializeUtils.unserializeBswabePrv(pub, prv_byte);
+//
+//		String[] attr_arr = LangPolicy.parseAttribute(attr_subset);
+
+		String[] subset = LangPolicy.parseAttribute(attr_subset);
+		prv_delegate = Bswabe.delegate(pub_tmp, prv_tmp, subset);
+		byte[] prv_byte = SerializeUtils.serializeBswabePrv(prv_delegate);
+		Common.spitFile(prvfile, prv_byte);
+	}
+
 	public void enc(String pubfile, String policy, String inputfile, String encfile) throws Exception {
 		BswabePub pub;
 		BswabeCph cph;
@@ -141,22 +162,5 @@ public class Cpabe {
 			return false;
 		}
 	}
-	public void delegate(String pubfile, String prvfile, String attr_subset) throws Exception {
-		byte[] prv_byte;
-		byte[] pub_byte;
-		BswabePrv prv;
-		BswabePub pub;
 
-		/* get BswabePub from pubfile */
-		pub_byte = Common.suckFile(pubfile);
-		pub = SerializeUtils.unserializeBswabePub(pub_byte);
-
-		/* get BswabePrv form prvfile */
-		prv_byte = Common.suckFile(prvfile);
-		prv = SerializeUtils.unserializeBswabePrv(pub, prv_byte);
-
-		String[] attr_arr = LangPolicy.parseAttribute(attr_subset);
-		Bswabe.delegate(pub_tmp, prv_tmp, attr_arr);
-
-	}
 }
