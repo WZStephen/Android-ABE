@@ -29,7 +29,7 @@ import com.cpabe.abe_lib.cpabe.*;
 
 public class MainActivity extends Activity {
 
-    TextView textResponse, url, entertex, disp_info, get_priv_key_name;
+    TextView textResponse, url, entertex, disp_info,disp_sk,  get_priv_key_name;
     EditText editTextAddress, editTextPort;
     Button buttonConnect, buttonClear, enc_button, dec_button;
     EditText welcomeMsg;
@@ -38,14 +38,11 @@ public class MainActivity extends Activity {
     Cpabe cpabe = new Cpabe();
 
     static String inputfile;
-    static String pubfile;
-    static String pubfile2;
-    static String mskfile;
-    static String mskfile2;
-    static String prvfile;
+    static String pubfile, pubfile2;
+    static String mskfile, mskfile2;
+    static String prvfile, prvfile_delegate, prvfile_delegate2;
     static String prvfile2;
-    static String encfile;
-    static String decfile;
+    static String encfile, decfile;
 
 
     @Override
@@ -67,11 +64,19 @@ public class MainActivity extends Activity {
         entertex = (EditText) findViewById(R.id.entertex);
         get_priv_key_name = (EditText) findViewById(R.id.get_priv_key);
 
-        //for displaying results
+        //for displaying attribute
         disp_info = (TextView) findViewById(R.id.global_attr);
-        disp_info.setText("ta:ta1, ta:ta2, ta:ta3\n"
-                + "attr:1, attr:2, attr:3 attr:4, attr:5\n"
-                + "attr:6, attr:7, attr:8, attr:9, attr:10");
+        disp_info.setText("ta1.sk: baf fim1 fim foo\n"
+                + "ta1_delegate: baf fim1 fim foo {fim, foo} \n"
+                + "ta1_delegate2: baf fim1 fim foo {fim}");
+
+        //for displaying avaliable keys
+        disp_sk = (TextView) findViewById(R.id.disp_sk);
+        disp_sk.setText("Private Keys: ta1.sk; ta1_delegate.sk; ta1.delegate2.sk \n"
+                + "Policy: foo bar fim 2of3 baf 1of2");
+
+
+        //for display system response
         textResponse = (TextView) findViewById(R.id.response);
 
         //connect button handler
@@ -116,7 +121,7 @@ public class MainActivity extends Activity {
                     writer.flush();
                     writer.close();
                     //开始进行加密
-                    textResponse.setText(abe_encrypted());
+                    textResponse.setText(abe_encrypt());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -149,31 +154,36 @@ public class MainActivity extends Activity {
     }
 
     //ABE encrypt method
-    private String abe_encrypted () throws Exception{
+    private String abe_encrypt() throws Exception{
         //待加密文件路径
         inputfile = MainActivity.this.getFilesDir() + "/FILE_TO_BE_ENC/input.txt";
 
         //密钥存储路径
         pubfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
         pubfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta2.pk";
+
         mskfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta1.msk";
         mskfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta2.msk";
 
         prvfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1.sk";
-        prvfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta2.sk";
+        prvfile_delegate   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1_delegate.sk";
+        prvfile_delegate2   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1_delegate2.sk";
+
+        //prvfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta2.sk";
 
         //加密解密文件存储路径
         encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
         decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
 
         //设置全球公钥属性
-        String attribute = "ta:ta1 ta:ta2 ta:ta3 "
-                + "attr:1 attr:2 attr:3 attr:4 attr:5 "
-                + "attr:6 attr:7 attr:8 attr:9 attr:10";
+        String[] attribute = {"baf", "fim1", "fim", "foo"};
+
+        //设置委派密钥属性
+        String[] attr_delegate_ok = {"fim", "foo"};
+        String[] attr_delegate_ko = {"fim"};
 
         //设置私钥属性和加密策略
-        String policy = "attr:1 attr:2 attr:3 3of3";
-        String policy2 = "attr:1 attr:2 attr:3 ta:ta1 ta:ta2 5of5";
+        String policy = "foo bar fim 2of3 baf 1of2";
 
         //生成密钥文件
         cpabe.setup(pubfile, mskfile);
@@ -182,14 +192,12 @@ public class MainActivity extends Activity {
         //生成公钥和对应密钥1
         cpabe.keygen(pubfile, prvfile, mskfile, attribute);
 
-        //委派密钥1(添加子集)
-        //cpabe.delegate(pubfile, prvfile, "ta:ta1 ta:ta3");
-
-        //生成公钥和对应密钥2
-        cpabe.keygen(pubfile, prvfile2, mskfile, attribute);
+        //委派密钥(添加子集)
+        cpabe.delegate(prvfile_delegate, attr_delegate_ok);
+        cpabe.delegate(prvfile_delegate2, attr_delegate_ko);
 
         //加密
-        cpabe.enc(pubfile, policy2, inputfile, encfile);
+        cpabe.enc(pubfile, policy, inputfile, encfile);
 
         return "ABE Encrypt success, encrypted file is stored at \n" + encfile +
                 "\n\n The attribute is \n" + attribute +
@@ -201,7 +209,7 @@ public class MainActivity extends Activity {
     }
 
     //ABE decrypt method
-    private boolean abe_decrypt (String priv_key_name) throws Exception{
+    private boolean abe_decrypt(String priv_key_name) throws Exception{
         pubfile = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
         prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/" + priv_key_name;
 

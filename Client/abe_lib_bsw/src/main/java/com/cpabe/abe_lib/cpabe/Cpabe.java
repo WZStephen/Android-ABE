@@ -12,6 +12,7 @@ import com.cpabe.abe_lib.cpabe.policy.LangPolicy;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import it.unisa.dia.gas.jpbc.Element;
 
@@ -22,8 +23,10 @@ public class Cpabe {
 	 * @author Junwei Wang(wakemecn@gmail.com)
 	 */
 
+	//存储临时的公钥密钥用来委派
 	BswabePub pub_tmp;
 	BswabePrv prv_tmp;
+	//ArrayList<BswabePrv> prv_tmp = new ArrayList<BswabePrv>();
 
 	public void setup(String pubfile, String mskfile) throws IOException,
 			ClassNotFoundException {
@@ -32,11 +35,8 @@ public class Cpabe {
 		BswabeMsk msk = new BswabeMsk();
 		Bswabe.setup(pub, msk);
 
-		//保存pub用来delegate
+		//保存公钥用来delegate
 		pub_tmp = pub;
-
-//		String[] attr_subset = {"attr:11", "attr:12", "attr:13"}
-//		Bswabe.delegate(pub, msk, attr_subset);
 
 		/* store BswabePub into mskfile */
 		pub_byte = SerializeUtils.serializeBswabePub(pub);
@@ -47,7 +47,7 @@ public class Cpabe {
 		Common.spitFile(mskfile, msk_byte);
 	}
 
-	public void keygen(String pubfile, String prvfile, String mskfile, String attr_str) throws NoSuchAlgorithmException, IOException {
+	public void keygen(String pubfile, String prvfile, String mskfile, String[] attr_str) throws NoSuchAlgorithmException, IOException {
 		BswabePub pub;
 		BswabeMsk msk;
 		byte[] pub_byte, msk_byte, prv_byte;
@@ -60,10 +60,11 @@ public class Cpabe {
 		msk_byte = Common.suckFile(mskfile);
 		msk = SerializeUtils.unserializeBswabeMsk(pub, msk_byte);
 
-		String[] attr_arr = LangPolicy.parseAttribute(attr_str);
-		BswabePrv prv = Bswabe.keygen(pub, msk, attr_arr);
+		//String[] attr_arr = LangPolicy.parseAttribute(attr_str);
+		BswabePrv prv = Bswabe.keygen(pub, msk, attr_str);
 
 		//保存prv用来delegate
+		//prv_tmp.add(prv);
 		prv_tmp = prv;
 
 		/* store BswabePrv into prvfile */
@@ -71,25 +72,11 @@ public class Cpabe {
 		Common.spitFile(prvfile, prv_byte);
 	}
 
-	public void  delegate(String pubfile, String prvfile, String attr_subset) throws Exception {
-
+	public void  delegate(String prvfile_delegate, String[] attr_subset) throws Exception {
 		BswabePrv prv_delegate;
-//		BswabePub pub;
-//
-//		/* get BswabePub from pubfile */
-//		byte[] pub_byte = Common.suckFile(pubfile);
-//		pub = SerializeUtils.unserializeBswabePub(pub_byte);
-//
-//		/* get BswabePrv form prvfile */
-//		byte[] prv_byte = Common.suckFile(prvfile);
-//		prv = SerializeUtils.unserializeBswabePrv(pub, prv_byte);
-//
-//		String[] attr_arr = LangPolicy.parseAttribute(attr_subset);
-
-		String[] subset = LangPolicy.parseAttribute(attr_subset);
-		prv_delegate = Bswabe.delegate(pub_tmp, prv_tmp, subset);
-		byte[] prv_byte = SerializeUtils.serializeBswabePrv(prv_delegate);
-		Common.spitFile(prvfile, prv_byte);
+		prv_delegate = Bswabe.delegate(pub_tmp, prv_tmp, attr_subset);
+		byte[] prvfile_delegate_byte = SerializeUtils.serializeBswabePrv(prv_delegate);
+		Common.spitFile(prvfile_delegate, prvfile_delegate_byte);
 	}
 
 	public void enc(String pubfile, String policy, String inputfile, String encfile) throws Exception {
