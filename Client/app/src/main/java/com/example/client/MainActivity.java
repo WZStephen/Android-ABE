@@ -67,13 +67,13 @@ public class MainActivity extends Activity {
         //for displaying attribute
         disp_info = (TextView) findViewById(R.id.global_attr);
         disp_info.setText("ta1.sk: baf fim1 fim foo\n"
-                + "ta1_delegate: baf fim1 fim foo {fim, foo} \n"
-                + "ta1_delegate2: baf fim1 fim foo {fim}");
+                + "ta1_delegate: fim, foo \n"
+                + "ta1_delegate2: fim");
 
         //for displaying avaliable keys
         disp_sk = (TextView) findViewById(R.id.disp_sk);
-        disp_sk.setText("Private Keys: ta1.sk; ta1_delegate.sk; ta1.delegate2.sk \n"
-                + "Policy: foo bar fim 2of3 baf 1of2");
+        disp_sk.setText("Private Keys: ta1.sk; ta1_delegate.sk; ta1_delegate2.sk \n"
+                + "Policy: (attr1 and attr2) or (attr2 and attr3) or (attr3 and attr4) or (attr5 and attr6))");
 
 
         //for display system response
@@ -108,6 +108,7 @@ public class MainActivity extends Activity {
         enc_button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                get_priv_key_name.setText("");
                 //deletefile("FILE_ENCRYPTED/Dec_tmp.txt");
                 File file = new File(MainActivity.this.getFilesDir(), "/FILE_TO_BE_ENC");
                 if (!file.exists()) {
@@ -176,14 +177,20 @@ public class MainActivity extends Activity {
         decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
 
         //设置全球公钥属性
-        String[] attribute = {"baf", "fim1", "fim", "foo"};
+        String[] attribute = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
         //设置委派密钥属性
-        String[] attr_delegate_ok = {"fim", "foo"};
-        String[] attr_delegate_ko = {"fim"};
+        String[] attr_delegate_ok = {"1", "2"};
+        String[] attr_delegate_ko = {"11", "12"};
 
         //设置私钥属性和加密策略
-        String policy = "foo bar fim 2of3 baf 1of2";
+        // (attr1 and attr2) or (attr2 and attr3) or (attr3 and attr4) or (attr5 and attr6))
+        String policy =
+                "1 2 2of2 " +
+                "2 3 2of2 " +
+                "3 4 2of2 " +
+                "5 6 2of2 " +
+                "1of4";
 
         //生成密钥文件
         cpabe.setup(pubfile, mskfile);
