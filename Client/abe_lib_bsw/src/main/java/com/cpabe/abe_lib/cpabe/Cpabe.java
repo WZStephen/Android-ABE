@@ -28,8 +28,7 @@ public class Cpabe {
 	BswabePrv prv_tmp;
 	//ArrayList<BswabePrv> prv_tmp = new ArrayList<BswabePrv>();
 
-	public void setup(String pubfile, String mskfile) throws IOException,
-			ClassNotFoundException {
+	public void setup(String pubfile, String mskfile) throws IOException {
 		byte[] pub_byte, msk_byte;
 		BswabePub pub = new BswabePub();
 		BswabeMsk msk = new BswabeMsk();

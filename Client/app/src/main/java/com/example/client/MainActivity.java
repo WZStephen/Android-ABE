@@ -38,8 +38,8 @@ public class MainActivity extends Activity {
     Cpabe cpabe = new Cpabe();
 
     static String inputfile;
-    static String pubfile, pubfile2;
-    static String mskfile, mskfile2;
+    static String pubfile, pubfile2, pubfile3, pubfile4, pubfile5, pubfile6, pubfile7, pubfile8, pubfile9, pubfile10;
+    static String mskfile, mskfile2, mskfile3, mskfile4, mskfile5, mskfile6, mskfile7, mskfile8, mskfile9, mskfile10;
     static String prvfile, prvfile_delegate, prvfile_delegate2;
     static String prvfile2;
     static String encfile, decfile;
@@ -162,11 +162,28 @@ public class MainActivity extends Activity {
         //密钥存储路径
         pubfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
         pubfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta2.pk";
+        pubfile3  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta3.pk";
+        pubfile4  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta4.pk";
+        pubfile5  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta5.pk";
+        pubfile6  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta6.pk";
+        pubfile7  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta7.pk";
+        pubfile8  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta8.pk";
+        pubfile9  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta9.pk";
+        pubfile10  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta10.pk";
 
         mskfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta1.msk";
         mskfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta2.msk";
+        mskfile3  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta3.msk";
+        mskfile4  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta4.msk";
+        mskfile5  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta5.msk";
+        mskfile6  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta6.msk";
+        mskfile7  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta7.msk";
+        mskfile8  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta8.msk";
+        mskfile9  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta9.msk";
+        mskfile10  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta10.msk";
 
         prvfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1.sk";
+
         prvfile_delegate   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1_delegate.sk";
         prvfile_delegate2   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1_delegate2.sk";
 
@@ -194,7 +211,6 @@ public class MainActivity extends Activity {
 
         //生成密钥文件
         cpabe.setup(pubfile, mskfile);
-        //cpabe.setup(pubfile2, mskfile2);
 
         //生成公钥和对应密钥1
         cpabe.keygen(pubfile, prvfile, mskfile, attribute);
@@ -217,6 +233,7 @@ public class MainActivity extends Activity {
 
     //ABE decrypt method
     private boolean abe_decrypt(String priv_key_name) throws Exception{
+
         pubfile = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
         prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/" + priv_key_name;
 
@@ -230,7 +247,7 @@ public class MainActivity extends Activity {
         return false;
     }
 
-    /*------------------------Utilities------------------------------------*/
+/*-------------------------------------------------------------------------Utilities-------------------------------------------------------------------------------------------------------*/
     //communication method
     public class MyClientTask extends AsyncTask<Void, Void, Void> {
         String dstAddress;
