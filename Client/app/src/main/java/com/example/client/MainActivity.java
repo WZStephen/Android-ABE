@@ -20,21 +20,16 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 //import abe lib
-
-import com.cpabe.abe_lib.bsw.Bswabe;
-import com.cpabe.abe_lib.bsw.BswabeMsk;
-import com.cpabe.abe_lib.bsw.BswabePrv;
-import com.cpabe.abe_lib.bsw.BswabePub;
 import com.cpabe.abe_lib.cpabe.*;
 
 public class MainActivity extends Activity {
 
-    TextView textResponse, url, entertex, disp_info,disp_sk,  get_priv_key_name;
+    TextView textResponse, url, entertex, get_priv_key_name;
     EditText editTextAddress, editTextPort;
     Button buttonConnect, buttonClear, enc_button, dec_button;
     EditText welcomeMsg;
 
-    //Encryption Vars
+    //Encryption vars
     Cpabe cpabe = new Cpabe();
 
     static String inputfile;
@@ -42,7 +37,7 @@ public class MainActivity extends Activity {
     static String mskfile, mskfile2, mskfile3, mskfile4, mskfile5, mskfile6, mskfile7, mskfile8, mskfile9, mskfile10;
     static String prvfile, prvfile_delegate, prvfile_delegate2;
     static String prvfile2;
-    static String encfile, decfile;
+    static String encfile, del_enc_file, decfile;
 
 
     @Override
@@ -63,18 +58,6 @@ public class MainActivity extends Activity {
         dec_button = (Button) findViewById(R.id.dec_button);
         entertex = (EditText) findViewById(R.id.entertex);
         get_priv_key_name = (EditText) findViewById(R.id.get_priv_key);
-
-        //for displaying attribute
-        disp_info = (TextView) findViewById(R.id.global_attr);
-        disp_info.setText("ta1.sk: baf fim1 fim foo\n"
-                + "ta1_delegate: fim, foo \n"
-                + "ta1_delegate2: fim");
-
-        //for displaying avaliable keys
-        disp_sk = (TextView) findViewById(R.id.disp_sk);
-        disp_sk.setText("Private Keys: ta1.sk; ta1_delegate.sk; ta1_delegate2.sk \n"
-                + "Policy: (attr1 and attr2) or (attr2 and attr3) or (attr3 and attr4) or (attr5 and attr6))");
-
 
         //for display system response
         textResponse = (TextView) findViewById(R.id.response);
@@ -109,8 +92,8 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v){
                 get_priv_key_name.setText("");
-                //deletefile("FILE_ENCRYPTED/Dec_tmp.txt");
-                File file = new File(MainActivity.this.getFilesDir(), "/FILE_TO_BE_ENC");
+                //deletefile("file_encrypted/Dec_tmp.txt");
+                File file = new File(MainActivity.this.getFilesDir(), "/");
                 if (!file.exists()) {
                     file.mkdir();
                 }
@@ -138,10 +121,10 @@ public class MainActivity extends Activity {
                     //开始进行解密
                     boolean flag_dec;
                     flag_dec = abe_decrypt(get_priv_key_name.getText().toString());
+
                     if(flag_dec){
                         Toast.makeText(MainActivity.this, "Decryption Operates Successfully!", Toast.LENGTH_LONG).show();
-                        textResponse.setText(readFile("FILE_DECRYPTED/input.txt.new"));
-                        //deletefile("FILE_ENCRYPTED/Dec_tmp.txt");
+                        textResponse.setText(readFile("/input.txt.dec"));
                     } else {
                         Toast.makeText(MainActivity.this, flag_dec + "Decrypted File does not exist", Toast.LENGTH_LONG).show();
                         textResponse.setText("Wrong Secret Key");
@@ -157,51 +140,31 @@ public class MainActivity extends Activity {
     //ABE encrypt method
     private String abe_encrypt() throws Exception{
         //待加密文件路径
-        inputfile = MainActivity.this.getFilesDir() + "/FILE_TO_BE_ENC/input.txt";
+        inputfile = MainActivity.this.getFilesDir() + "/input.txt";
 
         //密钥存储路径
-        pubfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
-        pubfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta2.pk";
-        pubfile3  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta3.pk";
-        pubfile4  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta4.pk";
-        pubfile5  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta5.pk";
-        pubfile6  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta6.pk";
-        pubfile7  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta7.pk";
-        pubfile8  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta8.pk";
-        pubfile9  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta9.pk";
-        pubfile10  = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta10.pk";
+        pubfile   = MainActivity.this.getFilesDir() + "/public_keys/ta1.pk";
+        mskfile   = MainActivity.this.getFilesDir() + "/master_keys/ta1.msk";
+        prvfile   = MainActivity.this.getFilesDir() + "/private_keys/ta1.sk";
+        prvfile_delegate   = MainActivity.this.getFilesDir() + "/private_keys/ta1_del.sk";
 
-        mskfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta1.msk";
-        mskfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta2.msk";
-        mskfile3  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta3.msk";
-        mskfile4  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta4.msk";
-        mskfile5  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta5.msk";
-        mskfile6  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta6.msk";
-        mskfile7  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta7.msk";
-        mskfile8  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta8.msk";
-        mskfile9  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta9.msk";
-        mskfile10  = MainActivity.this.getFilesDir() + "/BSW_ENV/master_keys/ta10.msk";
-
-        prvfile   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1.sk";
-
-        prvfile_delegate   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1_delegate.sk";
-        prvfile_delegate2   = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta1_delegate2.sk";
-
-        //prvfile2  = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/ta2.sk";
+        //prvfile2  = MainActivity.this.getFilesDir() + "/bsw_environment/private_keys/ta2.sk";
 
         //加密解密文件存储路径
-        encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
-        decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
+        encfile =  MainActivity.this.getFilesDir() + "/input.txt.enc";
+        del_enc_file =  MainActivity.this.getFilesDir() + "/input.txt.del.enc";
+
+
+        decfile = MainActivity.this.getFilesDir() + "/input.txt.dec";
 
         //设置全球公钥属性
         String[] attribute = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
         //设置委派密钥属性
-        String[] attr_delegate_ok = {"1", "2"};
-        String[] attr_delegate_ko = {"11", "12"};
+        String[] attr_delegate_ok = {"1", "2", "3", "4"};
+        //String[] attr_delegate_ko = {"11", "12"};
 
         //设置私钥属性和加密策略
-        // (attr1 and attr2) or (attr2 and attr3) or (attr3 and attr4) or (attr5 and attr6))
         String policy =
                 "1 2 2of2 " +
                 "2 3 2of2 " +
@@ -217,13 +180,14 @@ public class MainActivity extends Activity {
 
         //委派密钥(添加子集)
         cpabe.delegate(prvfile_delegate, attr_delegate_ok);
-        cpabe.delegate(prvfile_delegate2, attr_delegate_ko);
 
         //加密
-        cpabe.enc(pubfile, policy, inputfile, encfile);
+        //cpabe.enc(pubfile, policy, inputfile, encfile);
 
-        return "ABE Encrypt success, encrypted file is stored at \n" + encfile +
-                "\n\n The attribute is \n" + attribute +
+        cpabe.enc(pubfile, policy, inputfile, del_enc_file);
+
+        return "Success, enc file is stored at \n" + encfile +
+                "\n\n The attribute is \n" + "{\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"10\"}" +
                 "\n\n The policy is \n" + policy +
                 "\n\n Three Keys Stored " +
                 "\n\n Public_key: \n" + pubfile +
@@ -234,17 +198,17 @@ public class MainActivity extends Activity {
     //ABE decrypt method
     private boolean abe_decrypt(String priv_key_name) throws Exception{
 
-        pubfile = MainActivity.this.getFilesDir() + "/BSW_ENV/public_keys/ta1.pk";
-        prvfile = MainActivity.this.getFilesDir() + "/BSW_ENV/private_keys/" + priv_key_name;
+        pubfile = MainActivity.this.getFilesDir() + "/public_keys/ta1.pk";
+        prvfile = MainActivity.this.getFilesDir() + "/private_keys/" + priv_key_name;
 
-        encfile =  MainActivity.this.getFilesDir() + "/FILE_ENCRYPTED/input.txt.cpabe";
-        decfile = MainActivity.this.getFilesDir() + "/FILE_DECRYPTED/input.txt.new";
+        //encfile =  MainActivity.this.getFilesDir() + "/input.txt.enc";
+        encfile =  MainActivity.this.getFilesDir() + "/input.txt.del.enc";
+
+        decfile = MainActivity.this.getFilesDir() + "/input.txt.dec";
 
         //解密
-        boolean flag_dec = cpabe.dec(pubfile, prvfile, encfile, decfile);
-        if (flag_dec)
-            return true;
-        return false;
+        return cpabe.dec(pubfile, prvfile, encfile, decfile);
+
     }
 
 /*-------------------------------------------------------------------------Utilities-------------------------------------------------------------------------------------------------------*/

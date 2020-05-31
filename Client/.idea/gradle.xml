@@ -10,8 +10,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/abe_lib" />
             <option value="$PROJECT_DIR$/abe_lib_bsw" />
+            <option value="$PROJECT_DIR$/abe_lib_cloud" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
