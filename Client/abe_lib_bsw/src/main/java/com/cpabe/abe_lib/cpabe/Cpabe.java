@@ -32,6 +32,8 @@ public class Cpabe {
 		byte[] pub_byte, msk_byte;
 		BswabePub pub = new BswabePub();
 		BswabeMsk msk = new BswabeMsk();
+
+		//call bsw lib to set up public and private keys
 		Bswabe.setup(pub, msk);
 
 		//保存公钥用来delegate
@@ -46,7 +48,7 @@ public class Cpabe {
 		Common.spitFile(mskfile, msk_byte);
 	}
 
-	public void keygen(String pubfile, String prvfile, String mskfile, String[] attr_str) throws NoSuchAlgorithmException, IOException {
+	public void keygen(String pubfile, String prvfile, String mskfile, String[] attr_str, String gsIDs) throws NoSuchAlgorithmException, IOException {
 		BswabePub pub;
 		BswabeMsk msk;
 		byte[] pub_byte, msk_byte, prv_byte;
@@ -60,7 +62,7 @@ public class Cpabe {
 		msk = SerializeUtils.unserializeBswabeMsk(pub, msk_byte);
 
 		//String[] attr_arr = LangPolicy.parseAttribute(attr_str);
-		BswabePrv prv = Bswabe.keygen(pub, msk, attr_str);
+		BswabePrv prv = Bswabe.keygen(pub, msk, attr_str, gsIDs);
 
 		//保存prv用来delegate
 		//prv_tmp.add(prv);

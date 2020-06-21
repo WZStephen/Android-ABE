@@ -1,10 +1,12 @@
 package com.example.client;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,9 +26,11 @@ import com.cpabe.abe_lib.cpabe.*;
 
 public class MainActivity extends Activity {
 
-    TextView textResponse, url, entertex, get_priv_key_name;
-    EditText editTextAddress, editTextPort;
-    Button buttonConnect, buttonClear, enc_button, dec_button;
+    DatabaseHandler mDatabaseHelper;
+
+    TextView textResponse, id_tf, entertext_tf, prvKeyName_tf;
+    EditText editTextAddress, editTextPort, url;
+    Button buttonConnect, buttonClear, enc_button, dec_button, clear_button, checkif_button;
     EditText welcomeMsg;
 
     //Encryption vars
@@ -45,70 +49,94 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //for sending message
-        editTextAddress = (EditText) findViewById(R.id.address);
-        editTextPort = (EditText) findViewById(R.id.port);
-        buttonConnect = (Button) findViewById(R.id.connect);
-        buttonClear = (Button) findViewById(R.id.clear);
-        url = (TextView) findViewById(R.id.url);
-        welcomeMsg = (EditText)findViewById(R.id.welcomemsg);
+//        //for sending message
+//        editTextAddress = (EditText) findViewById(R.id.address);
+//        editTextPort = (EditText) findViewById(R.id.port);
+//        buttonConnect = (Button) findViewById(R.id.connect);
+//        buttonClear = (Button) findViewById(R.id.clear);
+//        url = (TextView) findViewById(R.id.url);
+//        welcomeMsg = (EditText)findViewById(R.id.welcomemsg);
+
+        mDatabaseHelper = new DatabaseHandler(this);
+        mDatabaseHelper.dropTable();
 
         //for ABE encrpt message
         enc_button = (Button) findViewById(R.id.enc_button);
         dec_button = (Button) findViewById(R.id.dec_button);
-        entertex = (EditText) findViewById(R.id.entertex);
-        get_priv_key_name = (EditText) findViewById(R.id.get_priv_key);
+        checkif_button = (Button) findViewById(R.id.checkinfo_button);
+        clear_button = (Button) findViewById(R.id.clear_button);
+
+        id_tf = (EditText) findViewById(R.id.id_tf);
+        entertext_tf = (EditText) findViewById(R.id.entertext_tf);
+        prvKeyName_tf = (EditText) findViewById(R.id.prvKeyName_tf);
 
         //for display system response
         textResponse = (TextView) findViewById(R.id.response);
 
-        //connect button handler
-        buttonConnect.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                String tMsg = welcomeMsg.getText().toString();
-                if(tMsg.equals("")){
-                    tMsg = null;
-                    Toast.makeText(MainActivity.this, "No Welcome Msg sent", Toast.LENGTH_SHORT).show();
-                }
-                MyClientTask myClientTask = new MyClientTask(editTextAddress
-                        .getText().toString(), Integer.parseInt(editTextPort
-                        .getText().toString()),
-                        tMsg);
-                myClientTask.execute();
-            }
-        });
+//        //connect button handler
+//        buttonConnect.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View v) {
+//                String tMsg = welcomeMsg.getText().toString();
+//                if(tMsg.equals("")){
+//                    tMsg = null;
+//                    Toast.makeText(MainActivity.this, "No Welcome Msg sent", Toast.LENGTH_SHORT).show();
+//                }
+//                MyClientTask myClientTask = new MyClientTask(editTextAddress
+//                        .getText().toString(), Integer.parseInt(editTextPort
+//                        .getText().toString()),
+//                        tMsg);
+//                myClientTask.execute();
+//            }
+//        });
 
-        buttonClear.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                textResponse.setText("");
-            }
-        });
+//        buttonClear.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                textResponse.setText("");
+//            }
+//        });
 
 
         //encrypt button handler
         enc_button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                get_priv_key_name.setText("");
-                //deletefile("file_encrypted/Dec_tmp.txt");
-                File file = new File(MainActivity.this.getFilesDir(), "/");
-                if (!file.exists()) {
-                    file.mkdir();
-                }
-                try {
-                    //写入输入值
-                    File gpxfile = new File(file, "input.txt");
-                    FileWriter writer = new FileWriter(gpxfile);
-                    writer.append(entertex.getText().toString());
-                    writer.flush();
-                    writer.close();
-                    //开始进行加密
-                    textResponse.setText(abe_encrypt());
+                String id_tf_text = id_tf.getText().toString();
+                String entertext_tf_text = entertext_tf.getText().toString();
+                if(!id_tf_text.isEmpty() &&  !entertext_tf_text.isEmpty()){
+                    //deletefile("file_encrypted/Dec_tmp.txt");
+                    File file = new File(MainActivity.this.getFilesDir(), "/");
+                    if (!file.exists()) {
+                        file.mkdir();
+                    }
+                    try {
+                        //write input to file for encryption
+                        File gpxfile = new File(file, "input.txt");
+                        FileWriter writer = new FileWriter(gpxfile);
+                        writer.append(entertext_tf.getText().toString());
+                        writer.flush();
+                        writer.close();
+                        //开始进行加密
+                        textResponse.setText(abe_encrypt());
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    //write the file into database
+                    //File test = new File(MainActivity.this. , "/");
+                    boolean isInserted = mDatabaseHelper.addData(id_tf_text, entertext_tf_text);
+                    if(isInserted){
+                        Toast.makeText(MainActivity.this, "insert success", Toast.LENGTH_LONG).show();
+                    } else{
+                        Toast.makeText(MainActivity.this, "insert failed", Toast.LENGTH_LONG).show();
+
+                    }
+                }
+                else{
+                    textResponse.setText("Please input required info!");
+                    textResponse.setTextColor(Color.RED);
                 }
             }
         });
@@ -120,7 +148,7 @@ public class MainActivity extends Activity {
                 try {
                     //开始进行解密
                     boolean flag_dec;
-                    flag_dec = abe_decrypt(get_priv_key_name.getText().toString());
+                    flag_dec = abe_decrypt(prvKeyName_tf.getText().toString());
 
                     if(flag_dec){
                         Toast.makeText(MainActivity.this, "Decryption Operates Successfully!", Toast.LENGTH_LONG).show();
@@ -133,6 +161,28 @@ public class MainActivity extends Activity {
                     textResponse.setText("There is Exception");
                     e.printStackTrace();
                 }
+            }
+        });
+
+        //check info button to display the store clients
+        checkif_button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(MainActivity.this, ListDataActivity.class);
+                startActivity(intent);
+            }
+
+        });
+
+
+        //clear the response text
+        clear_button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                id_tf.setText("");
+                entertext_tf.setText("");
+                prvKeyName_tf.setText("");
+                textResponse.setText("");
             }
         });
     }
@@ -176,7 +226,7 @@ public class MainActivity extends Activity {
         cpabe.setup(pubfile, mskfile);
 
         //生成公钥和对应密钥1
-        cpabe.keygen(pubfile, prvfile, mskfile, attribute);
+        cpabe.keygen(pubfile, prvfile, mskfile, attribute, "genius");
 
         //委派密钥(添加子集)
         cpabe.delegate(prvfile_delegate, attr_delegate_ok);

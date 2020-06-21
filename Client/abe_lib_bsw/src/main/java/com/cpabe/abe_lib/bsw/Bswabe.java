@@ -68,7 +68,7 @@ public class Bswabe {
 	/*
 	 * Generate a private key with the given set of attributes.
 	 */
-	public static BswabePrv keygen(BswabePub pub, BswabeMsk msk, String[] attrs)
+	public static BswabePrv keygen(BswabePub pub, BswabeMsk msk, String[] attrs, String gsIDs)
 			throws NoSuchAlgorithmException {
 		BswabePrv prv = new BswabePrv();
 		Element g_r, r, beta_inv;
@@ -80,6 +80,8 @@ public class Bswabe {
 		g_r = pairing.getG2().newElement();
 		r = pairing.getZr().newElement();
 		beta_inv = pairing.getZr().newElement();
+
+		pub.gsIDs = gsIDs;
 
 		/* compute */
 		r.setToRandom();
@@ -118,7 +120,6 @@ public class Bswabe {
 
 			prv.comps.add(comp);
 		}
-
 		return prv;
 	}
 

@@ -14,4 +14,6 @@ public class BswabePub{
 	public Element f;				/* G_1 */
 	public Element gp;			/* G_2 */
 	public Element g_hat_alpha;	/* G_T */
+
+	public String gsIDs; /*global secret key id for ta*/
 }
