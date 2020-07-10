@@ -64,7 +64,7 @@ public class Cpabe {
 		//String[] attr_arr = LangPolicy.parseAttribute(attr_str);
 		BswabePrv prv = Bswabe.keygen(pub, msk, attr_str, gsIDs);
 
-		//保存prv用来delegate
+		//save the prev key file for delegate
 		//prv_tmp.add(prv);
 		prv_tmp = prv;
 

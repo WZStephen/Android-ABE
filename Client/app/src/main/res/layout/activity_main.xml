@@ -23,6 +23,22 @@
             android:textStyle="bold" />
 
         <EditText
+            android:id="@+id/orgnization_tf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Organization name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/ta_tf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="TA name"
+            android:inputType="textPersonName" />
+
+        <EditText
             android:id="@+id/id_tf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -23,7 +23,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TABLE_NAME + " (ID TEXT PRIMARY KEY, INPUT TEXT)";
+        String createTable = "CREATE TABLE " + TABLE_NAME + " (ORGANIZATION TEXT, TA TEXT, ID TEXT PRIMARY KEY, INPUT TEXT)";
         db.execSQL(createTable);
     }
 
@@ -33,10 +33,12 @@ public class DatabaseHandler extends SQLiteOpenHelper{
         onCreate(db);
     }
 
-    public boolean addData(String id, String inputText) {
+    public boolean addData(String organizationName, String TAName, String id, String inputText) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
 
+        contentValues.put("ORGANIZATION", organizationName);
+        contentValues.put("TA", TAName + ".sk");
         contentValues.put("ID", id);
         contentValues.put("INPUT", inputText);
 

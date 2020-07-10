@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -28,7 +29,7 @@ public class MainActivity extends Activity {
 
     DatabaseHandler mDatabaseHelper;
 
-    TextView textResponse, id_tf, entertext_tf, prvKeyName_tf;
+    TextView textResponse, organization_tf, ta_tf, id_tf, entertext_tf, prvKeyName_tf;
     EditText editTextAddress, editTextPort, url;
     Button buttonConnect, buttonClear, enc_button, dec_button, clear_button, checkif_button;
     EditText welcomeMsg;
@@ -66,6 +67,8 @@ public class MainActivity extends Activity {
         checkif_button = (Button) findViewById(R.id.checkinfo_button);
         clear_button = (Button) findViewById(R.id.clear_button);
 
+        organization_tf = (EditText) findViewById(R.id.orgnization_tf);
+        ta_tf = (EditText) findViewById(R.id.ta_tf);
         id_tf = (EditText) findViewById(R.id.id_tf);
         entertext_tf = (EditText) findViewById(R.id.entertext_tf);
         prvKeyName_tf = (EditText) findViewById(R.id.prvKeyName_tf);
@@ -102,31 +105,38 @@ public class MainActivity extends Activity {
         enc_button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
+                //get the input from user
+                String organization_tf_text = organization_tf.getText().toString();
+                String ta_tf_text = ta_tf.getText().toString();
                 String id_tf_text = id_tf.getText().toString();
                 String entertext_tf_text = entertext_tf.getText().toString();
-                if(!id_tf_text.isEmpty() &&  !entertext_tf_text.isEmpty()){
+
+                //validate input and begin encryption
+                if(!organization_tf_text.isEmpty() && !ta_tf_text.isEmpty() &&
+                        !id_tf_text.isEmpty() &&  !entertext_tf_text.isEmpty()){
                     //deletefile("file_encrypted/Dec_tmp.txt");
                     File file = new File(MainActivity.this.getFilesDir(), "/");
                     if (!file.exists()) {
                         file.mkdir();
                     }
                     try {
-                        //write input to file for encryption
+                        //write input to file waiting for encryption
                         File gpxfile = new File(file, "input.txt");
                         FileWriter writer = new FileWriter(gpxfile);
                         writer.append(entertext_tf.getText().toString());
                         writer.flush();
                         writer.close();
-                        //开始进行加密
-                        textResponse.setText(abe_encrypt());
 
+                        //start to encrypt
+                        String response = abe_encrypt(organization_tf_text, ta_tf_text, id_tf_text);
+                        textResponse.setText(response);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                     //write the file into database
                     //File test = new File(MainActivity.this. , "/");
-                    boolean isInserted = mDatabaseHelper.addData(id_tf_text, entertext_tf_text);
+                    boolean isInserted = mDatabaseHelper.addData(organization_tf_text, ta_tf_text, id_tf_text, entertext_tf_text);
                     if(isInserted){
                         Toast.makeText(MainActivity.this, "insert success", Toast.LENGTH_LONG).show();
                     } else{
@@ -188,33 +198,38 @@ public class MainActivity extends Activity {
     }
 
     //ABE encrypt method
-    private String abe_encrypt() throws Exception{
-        //待加密文件路径
+    private String abe_encrypt(String organizationName, String TAName, String id) throws Exception{
+        //file path to be encrypted
         inputfile = MainActivity.this.getFilesDir() + "/input.txt";
 
-        //密钥存储路径
-        pubfile   = MainActivity.this.getFilesDir() + "/public_keys/ta1.pk";
-        mskfile   = MainActivity.this.getFilesDir() + "/master_keys/ta1.msk";
-        prvfile   = MainActivity.this.getFilesDir() + "/private_keys/ta1.sk";
-        prvfile_delegate   = MainActivity.this.getFilesDir() + "/private_keys/ta1_del.sk";
-
+        //keys store path
+        String[] parent_paths = new String[]{"/public_keys", "/master_keys", "/private_keys", "/prvfile_delegate"};
+        //create parent directory for storing the keys if not exist
+        for(int i = 0; i <=2; i++){
+            File file = new File(MainActivity.this.getFilesDir() + parent_paths[i]);
+            if (!file.exists()) {file.mkdir();}
+        }
+        pubfile   = MainActivity.this.getFilesDir() + "/public_keys/" + TAName +".pk";
+        mskfile   = MainActivity.this.getFilesDir() + "/master_keys/" + TAName + ".msk";
+        prvfile   = MainActivity.this.getFilesDir() + "/private_keys/" + TAName +".sk";
+        prvfile_delegate   = MainActivity.this.getFilesDir() + "/private_keys/" + TAName + "_del.sk";
         //prvfile2  = MainActivity.this.getFilesDir() + "/bsw_environment/private_keys/ta2.sk";
 
-        //加密解密文件存储路径
+        //encrypted file path
         encfile =  MainActivity.this.getFilesDir() + "/input.txt.enc";
         del_enc_file =  MainActivity.this.getFilesDir() + "/input.txt.del.enc";
 
 
         decfile = MainActivity.this.getFilesDir() + "/input.txt.dec";
 
-        //设置全球公钥属性
+        //set global attribute property
         String[] attribute = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
-        //设置委派密钥属性
+        //set delegated attribute property
         String[] attr_delegate_ok = {"1", "2", "3", "4"};
         //String[] attr_delegate_ko = {"11", "12"};
 
-        //设置私钥属性和加密策略
+        //set private key property and encryption policy
         String policy =
                 "1 2 2of2 " +
                 "2 3 2of2 " +
@@ -222,19 +237,18 @@ public class MainActivity extends Activity {
                 "5 6 2of2 " +
                 "1of4";
 
-        //生成密钥文件
+        //generate key files
         cpabe.setup(pubfile, mskfile);
 
-        //生成公钥和对应密钥1
+        //generate public key and corresponding private keys
         cpabe.keygen(pubfile, prvfile, mskfile, attribute, "genius");
 
-        //委派密钥(添加子集)
+        //delegate private keys (add subsets)
         cpabe.delegate(prvfile_delegate, attr_delegate_ok);
 
-        //加密
-        //cpabe.enc(pubfile, policy, inputfile, encfile);
-
-        cpabe.enc(pubfile, policy, inputfile, del_enc_file);
+        //encryption
+        //cpabe.enc(pubfile, policy, inputfile, encfile); //master encryption
+        cpabe.enc(pubfile, policy, inputfile, del_enc_file); //delegate encryption
 
         return "Success, enc file is stored at \n" + encfile +
                 "\n\n The attribute is \n" + "{\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"10\"}" +

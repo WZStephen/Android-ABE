@@ -81,7 +81,7 @@ public class Bswabe {
 		r = pairing.getZr().newElement();
 		beta_inv = pairing.getZr().newElement();
 
-		pub.gsIDs = gsIDs;
+		//pub.gsIDs = gsIDs;
 
 		/* compute */
 		r.setToRandom();
