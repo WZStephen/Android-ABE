@@ -1,0 +1,39 @@
+# Refered from https://www.jianshu.com/p/a5a6a18e00fc
+# && https://github.com/JHUISI/charm/tree/aded57440f23a9a75d7f09ee1d6d0392bed7b39f
+Required Lib:
+sudo apt-get install -y python3-pip
+sudo apt-get install m4
+sudo apt-get install flex
+sudo apt-get install bison
+
+Install GMP:
+wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2
+tar -jxvf gmp-6.1.2.tar.bz2
+cd gmp-6.1.2
+./configure
+make
+sudo make install
+cd ..
+
+Install PBC:
+wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
+tar -zxvf pbc-0.5.14.tar.gz
+make
+sudo make install
+sudo apt-get install libssl-dev
+sudo apt-get install libssl1.0-dev
+
+Install Charm
+git clone https://github.com/JHUISI/charm/tree/aded57440f23a9a75d7f09ee1d6d0392bed7b39f
+make
+sudo make install # charm-crypto-0.5
+#or
+pip3 install charm-crypto==0.43
+
+Validation:
+python3
+import charm
+#or
+View the files in /usr/local/lib
+#or
+Running the make test
