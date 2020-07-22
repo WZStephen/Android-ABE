@@ -1,15 +1,20 @@
 package com.cpabe.abe_lib.bsw;
 
+
 import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
+import it.unisa.dia.gas.plaf.jpbc.field.z.ZrElement;
 import it.unisa.dia.gas.plaf.jpbc.pairing.DefaultCurveParameters;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
@@ -29,10 +34,7 @@ public class Bswabe {
 
 	public static void setup(BswabePub pub, BswabeMsk msk) {
 		Element alpha, beta_inv;
-
-		CurveParameters params = new DefaultCurveParameters()
-				.load(new ByteArrayInputStream(curveParams.getBytes()));
-
+		CurveParameters params = new DefaultCurveParameters().load(new ByteArrayInputStream(curveParams.getBytes()));
 		pub.pairingDesc = curveParams;
 		pub.p = PairingFactory.getPairing(params);
 		Pairing pairing = pub.p;
@@ -56,20 +58,180 @@ public class Bswabe {
 
 		beta_inv = msk.beta.duplicate();
 		beta_inv.invert();
+
 		pub.f = pub.g.duplicate();
 		pub.f.powZn(beta_inv);
-
 		pub.h = pub.g.duplicate();
 		pub.h.powZn(msk.beta);
-
 		pub.g_hat_alpha = pairing.pairing(pub.g, msk.g_alpha);
 	}
 
-	/*
+	public static HashMap<String, Element> gsetup(){
+		//return global parameters{g1,g2,h}
+		CurveParameters params = new DefaultCurveParameters().load(new ByteArrayInputStream(curveParams.getBytes()));
+		BswabePub pub = new BswabePub();
+		pub.pairingDesc = curveParams;
+		pub.p = PairingFactory.getPairing(params);
+		Pairing pairing = pub.p;
+
+		Element g1 = pairing.getG1().newElement().setToRandom();
+		Element g2 = pairing.getG2().newElement().setToRandom();
+		Element h_new_1 = pairing.getG1().newElement().setToRandom();
+		Element h_new_2 = pairing.getG1().newElement().setToRandom();
+		Element h_new_3 = pairing.getG1().newElement().setToRandom();
+		Element h_new_4 = pairing.getG1().newElement().setToRandom();
+		Element h_new_5 = pairing.getG1().newElement().setToRandom();
+		Element h_new_6 = pairing.getG1().newElement().setToRandom();
+		Element h_new_7 = pairing.getG1().newElement().setToRandom();
+		Element h_new_8 = pairing.getG1().newElement().setToRandom();
+		Element h_new_9 = pairing.getG1().newElement().setToRandom();
+		Element h_new_10 = pairing.getG1().newElement().setToRandom();
+
+		HashMap<String, Element> gp = new HashMap<>();
+		gp.put("g1", g1);
+		gp.put("g2", g2);
+		gp.put("h1", h_new_1);
+		gp.put("h2", h_new_2);
+		gp.put("h3", h_new_3);
+		gp.put("h4", h_new_4);
+		gp.put("h5", h_new_5);
+		gp.put("h6", h_new_6);
+		gp.put("h7", h_new_7);
+		gp.put("h8", h_new_8);
+		gp.put("h9", h_new_9);
+		gp.put("h10", h_new_10);
+
+		return gp;
+	}
+	public static void ta_setup_tree(BswabePub pub, BswabeMsk msk, Node root, HashMap<String, Element> gp) throws NoSuchAlgorithmException {
+		Element alpha, beta_inv;
+		CurveParameters params = new DefaultCurveParameters().load(new ByteArrayInputStream(curveParams.getBytes()));
+		pub.pairingDesc = curveParams;
+		pub.p = PairingFactory.getPairing(params);
+		Pairing pairing = pub.p;
+
+		pub.g = pairing.getG1().newElement();
+		pub.f = pairing.getG1().newElement();
+		pub.h = pairing.getG1().newElement();
+		pub.gp = pairing.getG2().newElement();
+		pub.g_hat_alpha = pairing.getGT().newElement();
+		alpha = pairing.getZr().newElement();
+		msk.beta = pairing.getZr().newElement();
+		msk.g_alpha = pairing.getG2().newElement();
+
+		alpha.setToRandom();
+		msk.beta.setToRandom();
+		pub.g.setToRandom();
+		pub.gp.setToRandom();
+
+		msk.g_alpha = pub.gp.duplicate();
+		msk.g_alpha.powZn(alpha);
+
+		beta_inv = msk.beta.duplicate();
+		beta_inv.invert();
+
+		pub.f = pub.g.duplicate();
+		pub.f.powZn(beta_inv);
+		pub.h = pub.g.duplicate();
+		pub.h.powZn(msk.beta);
+		pub.g_hat_alpha = pairing.pairing(pub.g, msk.g_alpha);
+
+		//---------------integrate key with root node information during keygen---------------------
+		alpha = pairing.getZr().newElement().setToRandom();
+		Element b = pairing.getZr().newElement().setToRandom();
+		Element s = pairing.getZr().newElement().setToRandom();
+
+		//added new msk key structure
+		msk.s = s;
+		msk.beta = b;
+
+		//added new pub key structure
+		Element ZR = pairing.getZr().newElement();
+		String[] all_orgs = new String[]{"org1", "org2", "org3", "org4", "org5", "org6"};
+
+		pub.sID_org1 = elementFromString_rev(root.getValue(), ZR).powZn(s);
+		pub.sIDr_org1 = pub.sID_org1.duplicate().invert();
+		pub.sID_org2 = elementFromString_rev(all_orgs[1], pairing.getZr().newElement()).powZn(pub.sID_org1);
+		pub.sIDr_org2 = pub.sID_org1.duplicate().invert();
+		pub.sID_org3 = elementFromString_rev(all_orgs[2], pairing.getZr().newElement()).powZn(pub.sID_org1);
+		pub.sIDr_org3 = pub.sID_org1.duplicate().invert();
+		pub.sID_org4 = elementFromString_rev(all_orgs[3], pairing.getZr().newElement()).powZn(pub.sID_org1);
+		pub.sIDr_org4 = pub.sID_org1.duplicate().invert();
+		pub.sID_org5 = elementFromString_rev(all_orgs[4], pairing.getZr().newElement()).powZn(pub.sID_org2);
+		pub.sIDr_org5 = pub.sID_org1.duplicate().invert();
+		pub.sID_org6 = elementFromString_rev(all_orgs[5], pairing.getZr().newElement()).powZn(pub.sID_org2);
+		pub.sIDr_org6 = pub.sID_org1.duplicate().invert();
+
+//		pub.gbsIDs_org1 = elementFromString_rev(all_orgs[0], pairing.getZr().newElement()).powZn(s);
+		Element g1 = gp.get("g1");
+		Element g1b = g1.powZn(b);
+		Element g2 = gp.get("g2");
+		Element g2b = g2.powZn(b);
+		Element h1 = gp.get("h1");
+		Element h2 = gp.get("h2");
+		Element h3 = gp.get("h3");
+		Element h4 = gp.get("h4");
+		Element h5 = gp.get("h5");
+		Element h6 = gp.get("h6");
+		Element h7 = gp.get("h7");
+		Element h8 = gp.get("h8");
+		Element h9 = gp.get("h9");
+		Element h10 = gp.get("h10");
+
+		pub.gsIDs_org1 = g2.powZn(pub.sIDr_org1);
+		pub.gbsIDs_org1 = g2b.powZn(pub.sIDr_org1);
+		pub.gsIDs_org2 = g2.powZn(pub.sIDr_org2);
+		pub.gbsIDs_org2 = g2b.powZn(pub.sIDr_org2);
+		pub.gsIDs_org3 = g2.powZn(pub.sIDr_org3);
+		pub.gbsIDs_org3 = g2b.powZn(pub.sIDr_org3);
+		pub.gsIDs_org4 = g2.powZn(pub.sIDr_org4);
+		pub.gbsIDs_org4 = g2b.powZn(pub.sIDr_org4);
+		pub.gsIDs_org5 = g2.powZn(pub.sIDr_org5);
+		pub.gbsIDs_org5 = g2b.powZn(pub.sIDr_org5);
+		pub.gsIDs_org6 = g2.powZn(pub.sIDr_org6);
+		pub.gbsIDs_org6 = g2b.powZn(pub.sIDr_org6);
+
+		pub.hb1 = h1.powZn(b);
+		pub.hbb1 = h1.powZn(b.mul(b));
+		pub.hb2 = h2.powZn(b);
+		pub.hbb2 = h2.powZn(b.mul(b));
+		pub.hb3 = h3.powZn(b);
+		pub.hbb3 = h3.powZn(b.mul(b));
+		pub.hb4 = h4.powZn(b);
+		pub.hbb4 = h4.powZn(b.mul(b));
+		pub.hb5 = h5.powZn(b);
+		pub.hbb5 = h5.powZn(b.mul(b));
+		pub.hb6 = h6.powZn(b);
+		pub.hbb6 = h6.powZn(b.mul(b));
+		pub.hb7 = h7.powZn(b);
+		pub.hbb7 = h7.powZn(b.mul(b));
+		pub.hb8 = h8.powZn(b);
+		pub.hbb8 = h8.powZn(b.mul(b));
+		pub.hb9 = h9.powZn(b);
+		pub.hbb9 = h9.powZn(b.mul(b));
+		pub.hb10 = h10.powZn(b);
+		pub.hbb10 = h10.powZn(b.mul(b));
+
+		Element g1_alpha = g1.powZn(alpha);
+		Element e_gg_alpha = g1_alpha.
+		System.out.println();
+	}
+
+	public static void federated_setup1(BswabePub pub1, BswabePub pub2,BswabeMsk msk2, Node root) throws NoSuchAlgorithmException {
+		String[] all_orgs = new String[]{"org1", "org2", "org3", "org4", "org5", "org6"};
+		Element b = msk2.beta;
+		Element alpha = msk2.g_alpha;
+		Element s = msk2.s;
+
+		Element g2b = pub1.gp.powZn(b);
+		Element g1b = pub1.g.powZn(b);
+		Element g1bb = pub1.h.powZn(b);
+		Element e_gg_alpha = pub1.g_hat_alpha;
+	}
+		/*
 	 * Generate a private key with the given set of attributes.
 	 */
-	public static BswabePrv keygen(BswabePub pub, BswabeMsk msk, String[] attrs, String gsIDs)
-			throws NoSuchAlgorithmException {
+	public static BswabePrv keygen(BswabePub pub, BswabeMsk msk, String[] attrs) throws NoSuchAlgorithmException {
 		BswabePrv prv = new BswabePrv();
 		Element g_r, r, beta_inv;
 		Pairing pairing;
@@ -77,9 +239,9 @@ public class Bswabe {
 		/* initialize */
 		pairing = pub.p;
 		prv.d = pairing.getG2().newElement();
-		g_r = pairing.getG2().newElement();
+		//g_r = pairing.getG2().newElement();
 		r = pairing.getZr().newElement();
-		beta_inv = pairing.getZr().newElement();
+		//beta_inv = pairing.getZr().newElement();
 
 		//pub.gsIDs = gsIDs;
 
@@ -90,8 +252,10 @@ public class Bswabe {
 
 		prv.d = msk.g_alpha.duplicate();
 		prv.d.mul(g_r);
+
 		beta_inv = msk.beta.duplicate();
 		beta_inv.invert();
+
 		prv.d.powZn(beta_inv);
 
 		int i, len = attrs.length;
@@ -126,8 +290,7 @@ public class Bswabe {
     /*
      * Delegate a subset of attribute of an existing private key.
      */
-    public static BswabePrv delegate(BswabePub pub, BswabePrv prv_src, String[] attrs_subset)
-            throws NoSuchAlgorithmException, IllegalArgumentException {
+    public static BswabePrv delegate(BswabePub pub, BswabePrv prv_src, String[] attrs_subset) throws NoSuchAlgorithmException, IllegalArgumentException {
 
             BswabePrv prv = new BswabePrv();
             Element g_rt, rt, f_at_rt;
@@ -137,9 +300,9 @@ public class Bswabe {
             pairing = pub.p;
             prv.d = pairing.getG2().newElement();
 
-            g_rt = pairing.getG2().newElement();
+            //g_rt = pairing.getG2().newElement();
             rt = pairing.getZr().newElement();
-            f_at_rt = pairing.getZr().newElement();
+            //f_at_rt = pairing.getZr().newElement();
 
             /* compute */
             rt.setToRandom();
@@ -226,8 +389,7 @@ public class Bswabe {
 	 * Returns null if an error occured, in which case a description can be
 	 * retrieved by calling bswabe_error().
 	 */
-	public static BswabeCphKey enc(BswabePub pub, String policy)
-			throws Exception {
+	public static BswabeCphKey enc(BswabePub pub, String policy) throws Exception {
 		BswabeCphKey keyCph = new BswabeCphKey();
 		BswabeCph cph = new BswabeCph();
 		Element s, m;
@@ -433,8 +595,7 @@ public class Bswabe {
 		}
 	}
 
-	private static void fillPolicy(BswabePolicy p, BswabePub pub, Element e)
-			throws NoSuchAlgorithmException {
+	private static void fillPolicy(BswabePolicy p, BswabePub pub, Element e) throws NoSuchAlgorithmException {
 		int i;
 		Element r, t, h;
 		Pairing pairing = pub.p;
@@ -581,11 +742,16 @@ public class Bswabe {
 		return p;
 	}
 
-	private static void elementFromString(Element h, String s)
-			throws NoSuchAlgorithmException {
+	private static void elementFromString(Element h, String s) throws NoSuchAlgorithmException {
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 		byte[] digest = md.digest(s.getBytes());
 		h.setFromHash(digest, 0, digest.length);
+	}
+	private static Element elementFromString_rev(String s, Element h) throws NoSuchAlgorithmException {
+		MessageDigest md = MessageDigest.getInstance("SHA-1");
+		byte[] digest = md.digest(s.getBytes());
+		h.setFromHash(digest, 0, digest.length);
+		return h;
 	}
 
 	private static class IntegerComparator implements Comparator<Integer> {

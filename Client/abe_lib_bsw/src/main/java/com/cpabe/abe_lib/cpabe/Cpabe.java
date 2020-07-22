@@ -8,11 +8,12 @@ import com.cpabe.abe_lib.bsw.BswabeMsk;
 import com.cpabe.abe_lib.bsw.BswabePrv;
 import com.cpabe.abe_lib.bsw.BswabePub;
 import com.cpabe.abe_lib.bsw.SerializeUtils;
-import com.cpabe.abe_lib.cpabe.policy.LangPolicy;
+import com.cpabe.abe_lib.bsw.Node;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
+import java.util.HashMap;
+
 
 import it.unisa.dia.gas.jpbc.Element;
 
@@ -23,7 +24,7 @@ public class Cpabe {
 	 * @author Junwei Wang(wakemecn@gmail.com)
 	 */
 
-	//存储临时的公钥密钥用来委派
+	//Store the temporary pub and prv keys for delegate
 	BswabePub pub_tmp;
 	BswabePrv prv_tmp;
 	//ArrayList<BswabePrv> prv_tmp = new ArrayList<BswabePrv>();
@@ -36,7 +37,7 @@ public class Cpabe {
 		//call bsw lib to set up public and private keys
 		Bswabe.setup(pub, msk);
 
-		//保存公钥用来delegate
+		//Store a temp public key cache for delegation
 		pub_tmp = pub;
 
 		/* store BswabePub into mskfile */
@@ -48,7 +49,7 @@ public class Cpabe {
 		Common.spitFile(mskfile, msk_byte);
 	}
 
-	public void keygen(String pubfile, String prvfile, String mskfile, String[] attr_str, String gsIDs) throws NoSuchAlgorithmException, IOException {
+	public void keygen(String pubfile, String prvfile, String mskfile, String[] attr_str) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 		BswabePub pub;
 		BswabeMsk msk;
 		byte[] pub_byte, msk_byte, prv_byte;
@@ -62,7 +63,7 @@ public class Cpabe {
 		msk = SerializeUtils.unserializeBswabeMsk(pub, msk_byte);
 
 		//String[] attr_arr = LangPolicy.parseAttribute(attr_str);
-		BswabePrv prv = Bswabe.keygen(pub, msk, attr_str, gsIDs);
+		BswabePrv prv = Bswabe.keygen(pub, msk, attr_str);
 
 		//save the prev key file for delegate
 		//prv_tmp.add(prv);
@@ -73,7 +74,7 @@ public class Cpabe {
 		Common.spitFile(prvfile, prv_byte);
 	}
 
-	public void  delegate(String prvfile_delegate, String[] attr_subset) throws Exception {
+	public void delegate(String prvfile_delegate, String[] attr_subset) throws Exception {
 		BswabePrv prv_delegate;
 		prv_delegate = Bswabe.delegate(pub_tmp, prv_tmp, attr_subset);
 		byte[] prvfile_delegate_byte = SerializeUtils.serializeBswabePrv(prv_delegate);
@@ -151,4 +152,67 @@ public class Cpabe {
 		}
 	}
 
+	public Node treeStruc(){
+		Node org1 = new Node("org1");
+		Node org2 = new Node("org2");
+		Node org3 = new Node("org3");
+		Node org4 = new Node("org4");
+		Node org5 = new Node("org5");
+		Node org6 = new Node("org6");
+
+		org1.addChild(org2);
+		org1.addChild(org3);
+		org1.addChild(org4);
+		org2.addChild(org5);
+		org2.addChild(org6);
+
+//Generated Tree Structure
+//        org1
+//         |-- org2
+//         |   |-- org5
+//         |   +-- org6
+//         |-- org3
+//         +-- org4
+
+//        List<Node> temp = Node.getNode(org1); //test
+//        String temp1 = Node.getValue(temp.get(1)); //test
+		return org1;
+	}
+
+
+
+	public void federated_setup(String pubfile, String mskfile, Node rootNode) throws IOException, NoSuchAlgorithmException {
+		HashMap<String, Element> gp = Bswabe.gsetup();
+		byte[] pub_byte, msk_byte;
+		BswabePub pub = new BswabePub();
+		BswabeMsk msk = new BswabeMsk();
+		Bswabe.ta_setup_tree(pub, msk, rootNode, gp);
+
+		pub_byte = SerializeUtils.serializeBswabePub(pub);
+		Common.spitFile(pubfile, pub_byte);
+
+		msk_byte = SerializeUtils.serializeBswabeMsk(msk);
+		Common.spitFile(mskfile, msk_byte);
+	}
+
+	public void federated_setup1(String pubfile_pk_file1, String pubfile_pk_file2, String mskfile_msk_file2,Node rootNode) throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
+		byte[] pub_byte1;
+		byte[] pub_byte2;
+		byte[] msk_byte2;
+		BswabePub pub1;
+		BswabePub pub2;
+		BswabeMsk msk2;
+
+		//fist public file
+		pub_byte1 = Common.suckFile(pubfile_pk_file1);
+		pub1 = SerializeUtils.unserializeBswabePub(pub_byte1);
+
+		//second public file and msk file
+		pub_byte2 = Common.suckFile(pubfile_pk_file2);
+		pub2 = SerializeUtils.unserializeBswabePub(pub_byte2);
+		msk_byte2 = Common.suckFile(mskfile_msk_file2);
+		msk2 = SerializeUtils.unserializeBswabeMsk(pub2,msk_byte2);
+
+		Bswabe.federated_setup1(pub1, pub2, msk2, rootNode);
+	}
 }

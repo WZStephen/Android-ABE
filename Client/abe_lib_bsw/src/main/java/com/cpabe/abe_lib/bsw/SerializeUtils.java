@@ -1,7 +1,12 @@
 package com.cpabe.abe_lib.bsw;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Element;
@@ -64,7 +69,7 @@ public class SerializeUtils {
 		return offset + len;
 	}
 
-	public static byte[] serializeBswabePub(BswabePub pub) {
+	public static byte[] serializeBswabePub(BswabePub pub) throws IOException {
 		ArrayList<Byte> arrlist = new ArrayList<Byte>();
 	
 		serializeString(arrlist, pub.pairingDesc);
@@ -72,11 +77,24 @@ public class SerializeUtils {
 		serializeElement(arrlist, pub.h);
 		serializeElement(arrlist, pub.gp);
 		serializeElement(arrlist, pub.g_hat_alpha);
-	
+
+		serializeElement(arrlist, pub.sID_org1);
+		serializeElement(arrlist, pub.sID_org2);
+		serializeElement(arrlist, pub.sID_org3);
+		serializeElement(arrlist, pub.sID_org4);
+		serializeElement(arrlist, pub.sID_org5);
+		serializeElement(arrlist, pub.sID_org6);
+
+		serializeElement(arrlist, pub.sIDr_org1);
+		serializeElement(arrlist, pub.sIDr_org2);
+		serializeElement(arrlist, pub.sIDr_org3);
+		serializeElement(arrlist, pub.sIDr_org4);
+		serializeElement(arrlist, pub.sIDr_org5);
+		serializeElement(arrlist, pub.sIDr_org6);
 		return Byte_arr2byte_arr(arrlist);
 	}
 
-	public static BswabePub unserializeBswabePub(byte[] b) {
+	public static BswabePub unserializeBswabePub(byte[] b) throws IOException, ClassNotFoundException {
 		BswabePub pub;
 		int offset;
 	
@@ -96,12 +114,40 @@ public class SerializeUtils {
 		pub.h = pairing.getG1().newElement();
 		pub.gp = pairing.getG2().newElement();
 		pub.g_hat_alpha = pairing.getGT().newElement();
-	
+
+		pub.sID_org1 = pairing.getZr().newElement();
+		pub.sID_org2 = pairing.getZr().newElement();
+		pub.sID_org3 = pairing.getZr().newElement();
+		pub.sID_org4 = pairing.getZr().newElement();
+		pub.sID_org5 = pairing.getZr().newElement();
+		pub.sID_org6 = pairing.getZr().newElement();
+
+		pub.sIDr_org1 = pairing.getZr().newElement();
+		pub.sIDr_org2 = pairing.getZr().newElement();
+		pub.sIDr_org3 = pairing.getZr().newElement();
+		pub.sIDr_org4 = pairing.getZr().newElement();
+		pub.sIDr_org5 = pairing.getZr().newElement();
+		pub.sIDr_org6 = pairing.getZr().newElement();
+
+
 		offset = unserializeElement(b, offset, pub.g);
 		offset = unserializeElement(b, offset, pub.h);
 		offset = unserializeElement(b, offset, pub.gp);
 		offset = unserializeElement(b, offset, pub.g_hat_alpha);
-	
+		offset = unserializeElement(b, offset, pub.sID_org1);
+		offset = unserializeElement(b, offset, pub.sID_org2);
+		offset = unserializeElement(b, offset, pub.sID_org3);
+		offset = unserializeElement(b, offset, pub.sID_org4);
+		offset = unserializeElement(b, offset, pub.sID_org5);
+		offset = unserializeElement(b, offset, pub.sID_org6);
+
+		offset = unserializeElement(b, offset, pub.sIDr_org1);
+		offset = unserializeElement(b, offset, pub.sIDr_org2);
+		offset = unserializeElement(b, offset, pub.sIDr_org3);
+		offset = unserializeElement(b, offset, pub.sIDr_org4);
+		offset = unserializeElement(b, offset, pub.sIDr_org5);
+		offset = unserializeElement(b, offset, pub.sIDr_org6);
+
 		return pub;
 	}
 
@@ -111,7 +157,8 @@ public class SerializeUtils {
 	
 		serializeElement(arrlist, msk.beta);
 		serializeElement(arrlist, msk.g_alpha);
-	
+		serializeElement(arrlist, msk.s);
+
 		return Byte_arr2byte_arr(arrlist);
 	}
 
@@ -122,10 +169,12 @@ public class SerializeUtils {
 	
 		msk.beta = pub.p.getZr().newElement();
 		msk.g_alpha = pub.p.getG2().newElement();
-	
+		msk.s = pub.p.getZr().newElement();
+
 		offset = unserializeElement(b, offset, msk.beta);
 		offset = unserializeElement(b, offset, msk.g_alpha);
-	
+		offset = unserializeElement(b, offset, msk.s);
+
 		return msk;
 	}
 

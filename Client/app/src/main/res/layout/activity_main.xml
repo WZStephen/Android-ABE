@@ -61,6 +61,14 @@
             android:text="Encrypt" />
 
         <EditText
+            android:id="@+id/pubKeyName_tf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Enter Public Key Name"
+            android:inputType="textPersonName" />
+
+        <EditText
             android:id="@+id/prvKeyName_tf"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
