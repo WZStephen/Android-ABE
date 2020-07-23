@@ -74,7 +74,7 @@ public class Bswabe {
 		pub.p = PairingFactory.getPairing(params);
 		Pairing pairing = pub.p;
 
-		Element g1 = pairing.getG1().newElement().setToRandom();
+		Element g1 = pairing.getG1().newRandomElement();
 		Element g2 = pairing.getG2().newElement().setToRandom();
 		Element h_new_1 = pairing.getG1().newElement().setToRandom();
 		Element h_new_2 = pairing.getG1().newElement().setToRandom();
@@ -138,10 +138,10 @@ public class Bswabe {
 
 		//---------------integrate key with root node information during keygen---------------------
 		alpha = pairing.getZr().newElement().setToRandom();
-		Element b = pairing.getZr().newElement().setToRandom();
-		Element s = pairing.getZr().newElement().setToRandom();
+		Element b = pairing.getZr().newElement().setToRandom().getImmutable();
+		Element s = pairing.getZr().newElement().setToRandom().getImmutable();
 
-		//added new msk key structure
+		//new msk key structure
 		msk.s = s;
 		msk.beta = b;
 
@@ -149,48 +149,41 @@ public class Bswabe {
 		Element ZR = pairing.getZr().newElement();
 		String[] all_orgs = new String[]{"org1", "org2", "org3", "org4", "org5", "org6"};
 
-		pub.sID_org1 = elementFromString_rev(root.getValue(), ZR).powZn(s);
-		pub.sIDr_org1 = pub.sID_org1.duplicate().invert();
-		pub.sID_org2 = elementFromString_rev(all_orgs[1], pairing.getZr().newElement()).powZn(pub.sID_org1);
-		pub.sIDr_org2 = pub.sID_org1.duplicate().invert();
-		pub.sID_org3 = elementFromString_rev(all_orgs[2], pairing.getZr().newElement()).powZn(pub.sID_org1);
-		pub.sIDr_org3 = pub.sID_org1.duplicate().invert();
-		pub.sID_org4 = elementFromString_rev(all_orgs[3], pairing.getZr().newElement()).powZn(pub.sID_org1);
-		pub.sIDr_org4 = pub.sID_org1.duplicate().invert();
-		pub.sID_org5 = elementFromString_rev(all_orgs[4], pairing.getZr().newElement()).powZn(pub.sID_org2);
-		pub.sIDr_org5 = pub.sID_org1.duplicate().invert();
-		pub.sID_org6 = elementFromString_rev(all_orgs[5], pairing.getZr().newElement()).powZn(pub.sID_org2);
-		pub.sIDr_org6 = pub.sID_org1.duplicate().invert();
+		Element g1 = gp.get("g1").getImmutable();
+		Element g1b = g1.powZn(b).getImmutable();
+		Element g1bb = g1b.powZn(b);
+		Element g2 = gp.get("g2").getImmutable();
+		Element g2b = g2.powZn(b).getImmutable();
 
-//		pub.gbsIDs_org1 = elementFromString_rev(all_orgs[0], pairing.getZr().newElement()).powZn(s);
-		Element g1 = gp.get("g1");
-		Element g1b = g1.powZn(b);
-		Element g2 = gp.get("g2");
-		Element g2b = g2.powZn(b);
-		Element h1 = gp.get("h1");
-		Element h2 = gp.get("h2");
-		Element h3 = gp.get("h3");
-		Element h4 = gp.get("h4");
-		Element h5 = gp.get("h5");
-		Element h6 = gp.get("h6");
-		Element h7 = gp.get("h7");
-		Element h8 = gp.get("h8");
-		Element h9 = gp.get("h9");
-		Element h10 = gp.get("h10");
+		Element h1 = gp.get("h1").getImmutable();
+		Element h2 = gp.get("h2").getImmutable();
+		Element h3 = gp.get("h3").getImmutable();
+		Element h4 = gp.get("h4").getImmutable();
+		Element h5 = gp.get("h5").getImmutable();
+		Element h6 = gp.get("h6").getImmutable();
+		Element h7 = gp.get("h7").getImmutable();
+		Element h8 = gp.get("h8").getImmutable();
+		Element h9 = gp.get("h9").getImmutable();
+		Element h10 = gp.get("h10").getImmutable();
+		Element g1_alpha = g1.powZn(alpha).getImmutable();
 
-		pub.gsIDs_org1 = g2.powZn(pub.sIDr_org1);
-		pub.gbsIDs_org1 = g2b.powZn(pub.sIDr_org1);
-		pub.gsIDs_org2 = g2.powZn(pub.sIDr_org2);
-		pub.gbsIDs_org2 = g2b.powZn(pub.sIDr_org2);
-		pub.gsIDs_org3 = g2.powZn(pub.sIDr_org3);
-		pub.gbsIDs_org3 = g2b.powZn(pub.sIDr_org3);
-		pub.gsIDs_org4 = g2.powZn(pub.sIDr_org4);
-		pub.gbsIDs_org4 = g2b.powZn(pub.sIDr_org4);
-		pub.gsIDs_org5 = g2.powZn(pub.sIDr_org5);
-		pub.gbsIDs_org5 = g2b.powZn(pub.sIDr_org5);
-		pub.gsIDs_org6 = g2.powZn(pub.sIDr_org6);
-		pub.gbsIDs_org6 = g2b.powZn(pub.sIDr_org6);
-
+		//new pub key structure
+		pub.g1 = g1;
+		pub.g2 = g2;
+		pub.g2b = g2b;
+		pub.g1b = g1b;
+		pub.g1bb = g1bb;
+		pub.e_gg_alpha = pairing.pairing(g1_alpha, g2);
+		pub.h_new_1 = gp.get("h1");
+		pub.h_new_2 = gp.get("h2");
+		pub.h_new_3 = gp.get("h3");
+		pub.h_new_4 = gp.get("h4");
+		pub.h_new_5 = gp.get("h5");
+		pub.h_new_6 = gp.get("h6");
+		pub.h_new_7 = gp.get("h7");
+		pub.h_new_8 = gp.get("h8");
+		pub.h_new_9 = gp.get("h9");
+		pub.h_new_10 = gp.get("h10");
 		pub.hb1 = h1.powZn(b);
 		pub.hbb1 = h1.powZn(b.mul(b));
 		pub.hb2 = h2.powZn(b);
@@ -212,8 +205,32 @@ public class Bswabe {
 		pub.hb10 = h10.powZn(b);
 		pub.hbb10 = h10.powZn(b.mul(b));
 
-		Element g1_alpha = g1.powZn(alpha);
-		Element e_gg_alpha = g1_alpha.
+		pub.sID_org1 = elementFromString_rev(root.getValue(), ZR).powZn(s).getImmutable();
+		pub.sIDr_org1 = pub.sID_org1.duplicate().invert().getImmutable();
+		pub.sID_org2 = elementFromString_rev(all_orgs[1], pairing.getZr().newElement()).powZn(pub.sID_org1).getImmutable();
+		pub.sIDr_org2 = pub.sID_org2.duplicate().invert().getImmutable();
+		pub.sID_org3 = elementFromString_rev(all_orgs[2], pairing.getZr().newElement()).powZn(pub.sID_org1).getImmutable();
+		pub.sIDr_org3 = pub.sID_org3.duplicate().invert().getImmutable();
+		pub.sID_org4 = elementFromString_rev(all_orgs[3], pairing.getZr().newElement()).powZn(pub.sID_org1).getImmutable();
+		pub.sIDr_org4 = pub.sID_org4.duplicate().invert().getImmutable();
+		pub.sID_org5 = elementFromString_rev(all_orgs[4], pairing.getZr().newElement()).powZn(pub.sID_org2).getImmutable();
+		pub.sIDr_org5 = pub.sID_org5.duplicate().invert().getImmutable();
+		pub.sID_org6 = elementFromString_rev(all_orgs[5], pairing.getZr().newElement()).powZn(pub.sID_org2).getImmutable();
+		pub.sIDr_org6 = pub.sID_org6.duplicate().invert().getImmutable();
+
+		pub.gsIDs_org1 = g2.powZn(pub.sIDr_org1);
+		pub.gbsIDs_org1 = g2b.powZn(pub.sIDr_org1);
+		pub.gsIDs_org2 = g2.powZn(pub.sIDr_org2);
+		pub.gbsIDs_org2 = g2b.powZn(pub.sIDr_org2);
+		pub.gsIDs_org3 = g2.powZn(pub.sIDr_org3);
+		pub.gbsIDs_org3 = g2b.powZn(pub.sIDr_org3);
+		pub.gsIDs_org4 = g2.powZn(pub.sIDr_org4);
+		pub.gbsIDs_org4 = g2b.powZn(pub.sIDr_org4);
+		pub.gsIDs_org5 = g2.powZn(pub.sIDr_org5);
+		pub.gbsIDs_org5 = g2b.powZn(pub.sIDr_org5);
+		pub.gsIDs_org6 = g2.powZn(pub.sIDr_org6);
+		pub.gbsIDs_org6 = g2b.powZn(pub.sIDr_org6);
+
 		System.out.println();
 	}
 

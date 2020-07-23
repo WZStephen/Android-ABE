@@ -178,9 +178,7 @@ public class Cpabe {
 //        String temp1 = Node.getValue(temp.get(1)); //test
 		return org1;
 	}
-
-
-
+	
 	public void federated_setup(String pubfile, String mskfile, Node rootNode) throws IOException, NoSuchAlgorithmException {
 		HashMap<String, Element> gp = Bswabe.gsetup();
 		byte[] pub_byte, msk_byte;

@@ -35,7 +35,6 @@ public class BswabePub{
 	public Element h_new_8;
 	public Element h_new_9;
 	public Element h_new_10;
-	public Element hb_new;
 	public Element gsIDs_org1;
 	public Element gsIDs_org2;
 	public Element gsIDs_org3;
