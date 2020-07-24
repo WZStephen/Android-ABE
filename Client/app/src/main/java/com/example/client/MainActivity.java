@@ -238,6 +238,7 @@ public class MainActivity extends Activity {
         String[] TAs = new String[]{"ta1", "ta2", "ta3"};
         String[] ta_pk_filenames = new String[]{pubfile_ta1, pubfile_ta2, pubfile_ta3};
         String[] ta_msk_filenames = new String[]{mskfile_ta1, mskfile_ta2, mskfile_ta3};
+        String[] ta_sk_filenames = new String[]{prvfile_ta1, prvfile_ta2, prvfile_ta3};
 
         //define encrypted file path
         encfile =  MainActivity.this.getFilesDir() + "/input.txt.enc";
@@ -265,10 +266,11 @@ public class MainActivity extends Activity {
 
         Node root = cpabe.treeStruc(); //a root node contains all the child node in the tree
         for(int i = 0; i < TAs.length; i++){
-            cpabe.federated_setup(ta_pk_filenames[i], ta_msk_filenames[i], root);
+            cpabe.ta_setup_tree(ta_pk_filenames[i], ta_msk_filenames[i], root);
         }
-        cpabe.federated_setup1(ta_pk_filenames[0], ta_pk_filenames[0], ta_msk_filenames[0], root);
-        System.out.println();
+        for(int i = 0; i < TAs.length; i++) {
+            cpabe.federated_setup1(ta_pk_filenames[i], ta_pk_filenames[i], ta_msk_filenames[0], root);
+        }
 
 
         //generate public key and corresponding private keys

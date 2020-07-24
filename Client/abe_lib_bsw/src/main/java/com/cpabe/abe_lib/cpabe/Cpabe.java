@@ -28,6 +28,7 @@ public class Cpabe {
 	BswabePub pub_tmp;
 	BswabePrv prv_tmp;
 	//ArrayList<BswabePrv> prv_tmp = new ArrayList<BswabePrv>();
+	HashMap<String, Element> gp = Bswabe.gsetup();
 
 	public void setup(String pubfile, String mskfile) throws IOException {
 		byte[] pub_byte, msk_byte;
@@ -178,9 +179,7 @@ public class Cpabe {
 //        String temp1 = Node.getValue(temp.get(1)); //test
 		return org1;
 	}
-	
-	public void federated_setup(String pubfile, String mskfile, Node rootNode) throws IOException, NoSuchAlgorithmException {
-		HashMap<String, Element> gp = Bswabe.gsetup();
+	public void ta_setup_tree(String pubfile, String mskfile, Node rootNode) throws IOException, NoSuchAlgorithmException {
 		byte[] pub_byte, msk_byte;
 		BswabePub pub = new BswabePub();
 		BswabeMsk msk = new BswabeMsk();
@@ -213,4 +212,21 @@ public class Cpabe {
 
 		Bswabe.federated_setup1(pub1, pub2, msk2, rootNode);
 	}
+
+
+//	public void federated_setup(String pubfile, String mskfile, Node rootNode) throws IOException, NoSuchAlgorithmException {
+//		HashMap<String, Element> gp = Bswabe.gsetup();
+//		byte[] pub_byte, msk_byte;
+//		BswabePub pub = new BswabePub();
+//		BswabeMsk msk = new BswabeMsk();
+//		Bswabe.ta_setup_tree(pub, msk, rootNode, gp);
+//
+//		pub_byte = SerializeUtils.serializeBswabePub(pub);
+//		Common.spitFile(pubfile, pub_byte);
+//
+//		msk_byte = SerializeUtils.serializeBswabeMsk(msk);
+//		Common.spitFile(mskfile, msk_byte);
+//	}
+
+
 }

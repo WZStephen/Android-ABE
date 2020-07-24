@@ -230,10 +230,10 @@ public class Bswabe {
 		pub.gbsIDs_org5 = g2b.powZn(pub.sIDr_org5);
 		pub.gsIDs_org6 = g2.powZn(pub.sIDr_org6);
 		pub.gbsIDs_org6 = g2b.powZn(pub.sIDr_org6);
-
-		System.out.println();
 	}
+	public static void setupGP(){
 
+	}
 	public static void federated_setup1(BswabePub pub1, BswabePub pub2,BswabeMsk msk2, Node root) throws NoSuchAlgorithmException {
 		String[] all_orgs = new String[]{"org1", "org2", "org3", "org4", "org5", "org6"};
 		Element b = msk2.beta;

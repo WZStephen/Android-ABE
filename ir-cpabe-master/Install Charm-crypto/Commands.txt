@@ -11,21 +11,25 @@ wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2
 tar -jxvf gmp-6.1.2.tar.bz2
 cd gmp-6.1.2
 ./configure
-make
+sudo make
 sudo make install
 cd ..
 
 Install PBC:
 wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz
 tar -zxvf pbc-0.5.14.tar.gz
+cd pbc-0.5.14
+./configure
 make
 sudo make install
+cd ..
 sudo apt-get install libssl-dev
 sudo apt-get install libssl1.0-dev
 
-Install Charm
-git clone https://github.com/JHUISI/charm/tree/aded57440f23a9a75d7f09ee1d6d0392bed7b39f
-make
+Install Charm:
+git clone https://github.com/JHUISI/charm.git
+cd charm
+sudo make
 sudo make install # charm-crypto-0.5
 #or
 pip3 install charm-crypto==0.43
@@ -36,4 +40,4 @@ import charm
 #or
 View the files in /usr/local/lib
 #or
-Running the make test
+Running the "make test"
