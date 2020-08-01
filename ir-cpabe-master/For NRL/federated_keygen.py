@@ -38,8 +38,7 @@ def main():
 	for i in range(1, len(TAset)):
 		ta_first = "ta" + str(i)
 		ta_second = "ta" + str(i+1)
-		cpabe.federated_org_keygen(root_org, attr_assigned, ta_msk_filenames[ta_second], "pk.param", 
-			ta_sk_filenames[ta_first], ta_sk_filenames[ta_second], root_org)
+		cpabe.federated_org_keygen(root_org, attr_assigned, ta_msk_filenames[ta_second], "pk.param", ta_sk_filenames[ta_first], ta_sk_filenames[ta_second], root_org)
 	
 	command = "cp {} {}".format(ta_sk_filenames[TAset[-1]], root_org+".sk")
 	print("command is ", command)

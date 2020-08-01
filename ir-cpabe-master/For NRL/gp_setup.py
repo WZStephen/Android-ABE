@@ -7,7 +7,7 @@ def main():
 	gpfile = "global.param"
 	attr_dict = cpabe.read_attr_dict("attributes_map.json")
 	attr_size = len(attr_dict)
-	cpabe.gsetup(attr_size, gpfile)
+	cpabe.gsetup(attr_size, gpfile) #glonal.param
 	print( "Copy {} to all the servers and clients which use the ABE scheme".format(gpfile))
 	print(gpfile + " is the file containing global parameters such as math group used \n")
 

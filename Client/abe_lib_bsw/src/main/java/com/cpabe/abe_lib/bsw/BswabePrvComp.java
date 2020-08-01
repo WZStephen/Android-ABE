@@ -7,7 +7,7 @@ public class BswabePrvComp {
 	String attr;
 	Element d;					/* G_2 */
 	Element dp;				/* G_2 */
-	
+
 	/* only used during dec */
 	int used;
 	Element z;					/* G_1 */

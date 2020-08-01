@@ -32,6 +32,7 @@ public class SerializeUtils {
 		len = unserializeUint32(arr, offset);
 		e_byte = new byte[(int) len];
 		offset += 4;
+		//offset += 8;
 		for (i = 0; i < len; i++)
 			e_byte[i] = arr[offset + i];
 		e.setFromBytes(e_byte);
@@ -71,83 +72,236 @@ public class SerializeUtils {
 
 	public static byte[] serializeBswabePub(BswabePub pub) throws IOException {
 		ArrayList<Byte> arrlist = new ArrayList<Byte>();
-	
+
 		serializeString(arrlist, pub.pairingDesc);
 		serializeElement(arrlist, pub.g);
 		serializeElement(arrlist, pub.h);
 		serializeElement(arrlist, pub.gp);
 		serializeElement(arrlist, pub.g_hat_alpha);
 
-		serializeElement(arrlist, pub.sID_org1);
-		serializeElement(arrlist, pub.sID_org2);
-		serializeElement(arrlist, pub.sID_org3);
-		serializeElement(arrlist, pub.sID_org4);
-		serializeElement(arrlist, pub.sID_org5);
-		serializeElement(arrlist, pub.sID_org6);
+		int pubCompsLen, i;
+		pubCompsLen = pub.Ircpabe_comp.size();
+		serializeUint32(arrlist, pubCompsLen);
 
-		serializeElement(arrlist, pub.sIDr_org1);
-		serializeElement(arrlist, pub.sIDr_org2);
-		serializeElement(arrlist, pub.sIDr_org3);
-		serializeElement(arrlist, pub.sIDr_org4);
-		serializeElement(arrlist, pub.sIDr_org5);
-		serializeElement(arrlist, pub.sIDr_org6);
+		for (i = 0; i < pubCompsLen; i++) {
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).g1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).g1b);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).g1bb);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).g2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).g2b);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).e_gg_alpha);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h3);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h4);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h5);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h6);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h7);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h8);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h9);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).h10);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gsIDs_org1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gsIDs_org2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gsIDs_org3);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gsIDs_org4);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gsIDs_org5);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gsIDs_org6);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gbsIDs_org1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gbsIDs_org2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gbsIDs_org3);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gbsIDs_org4);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gbsIDs_org5);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).gbsIDs_org6);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sID_org1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sID_org2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sID_org3);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sID_org4);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sID_org5);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sID_org6);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sIDr_org1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sIDr_org2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sIDr_org3);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sIDr_org4);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sIDr_org5);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).sIDr_org6);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb3);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb4);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb5);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb6);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb7);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb8);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb9);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hb10);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb1);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb2);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb3);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb4);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb5);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb6);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb7);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb8);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb9);
+			serializeElement(arrlist, pub.Ircpabe_comp.get(i).hbb10);
+		}
 		return Byte_arr2byte_arr(arrlist);
 	}
 
 	public static BswabePub unserializeBswabePub(byte[] b) throws IOException, ClassNotFoundException {
 		BswabePub pub;
 		int offset;
-	
+
 		pub = new BswabePub();
 		offset = 0;
-	
+
 		StringBuffer sb = new StringBuffer("");
 		offset = unserializeString(b, offset, sb);
 		pub.pairingDesc = sb.substring(0);
-	
-		CurveParameters params = new DefaultCurveParameters()
-				.load(new ByteArrayInputStream(pub.pairingDesc.getBytes()));
+
+		CurveParameters params = new DefaultCurveParameters().load(new ByteArrayInputStream(pub.pairingDesc.getBytes()));
 		pub.p = PairingFactory.getPairing(params);
 		Pairing pairing = pub.p;
-	
+
 		pub.g = pairing.getG1().newElement();
 		pub.h = pairing.getG1().newElement();
 		pub.gp = pairing.getG2().newElement();
 		pub.g_hat_alpha = pairing.getGT().newElement();
 
-		pub.sID_org1 = pairing.getZr().newElement();
-		pub.sID_org2 = pairing.getZr().newElement();
-		pub.sID_org3 = pairing.getZr().newElement();
-		pub.sID_org4 = pairing.getZr().newElement();
-		pub.sID_org5 = pairing.getZr().newElement();
-		pub.sID_org6 = pairing.getZr().newElement();
-
-		pub.sIDr_org1 = pairing.getZr().newElement();
-		pub.sIDr_org2 = pairing.getZr().newElement();
-		pub.sIDr_org3 = pairing.getZr().newElement();
-		pub.sIDr_org4 = pairing.getZr().newElement();
-		pub.sIDr_org5 = pairing.getZr().newElement();
-		pub.sIDr_org6 = pairing.getZr().newElement();
-
-
 		offset = unserializeElement(b, offset, pub.g);
 		offset = unserializeElement(b, offset, pub.h);
 		offset = unserializeElement(b, offset, pub.gp);
 		offset = unserializeElement(b, offset, pub.g_hat_alpha);
-		offset = unserializeElement(b, offset, pub.sID_org1);
-		offset = unserializeElement(b, offset, pub.sID_org2);
-		offset = unserializeElement(b, offset, pub.sID_org3);
-		offset = unserializeElement(b, offset, pub.sID_org4);
-		offset = unserializeElement(b, offset, pub.sID_org5);
-		offset = unserializeElement(b, offset, pub.sID_org6);
 
-		offset = unserializeElement(b, offset, pub.sIDr_org1);
-		offset = unserializeElement(b, offset, pub.sIDr_org2);
-		offset = unserializeElement(b, offset, pub.sIDr_org3);
-		offset = unserializeElement(b, offset, pub.sIDr_org4);
-		offset = unserializeElement(b, offset, pub.sIDr_org5);
-		offset = unserializeElement(b, offset, pub.sIDr_org6);
+		pub.Ircpabe_comp = new ArrayList<>();
+		int len = unserializeUint32(b, offset);
+		for(int i = 0; i<len; i++){
+			Ircpabe in = new Ircpabe();
+			in.g1 =pairing.getG1().newElement();
+			in.g1b = pairing.getG1().newElement();
+			in.g1bb = pairing.getG1().newElement();
+			in.g2 = pairing.getG2().newElement();
+			in.g2b = pairing.getG2().newElement();
+			in.e_gg_alpha = pairing.getGT().newElement();
+			in.h1 = pairing.getG1().newElement();
+			in.h2 = pairing.getG1().newElement();
+			in.h3 = pairing.getG1().newElement();
+			in.h4 = pairing.getG1().newElement();
+			in.h5 = pairing.getG1().newElement();
+			in.h6 = pairing.getG1().newElement();
+			in.h7 = pairing.getG1().newElement();
+			in.h8 = pairing.getG1().newElement();
+			in.h9 = pairing.getG1().newElement();
+			in.h10 = pairing.getG1().newElement();
+			in.gsIDs_org1 = pairing.getG1().newElement();
+			in.gsIDs_org2 = pairing.getG1().newElement();
+			in.gsIDs_org3 = pairing.getG1().newElement();
+			in.gsIDs_org4 = pairing.getG1().newElement();
+			in.gsIDs_org5 = pairing.getG1().newElement();
+			in.gsIDs_org6 = pairing.getG1().newElement();
+			in.gbsIDs_org1 = pairing.getG1().newElement();
+			in.gbsIDs_org2 = pairing.getG1().newElement();
+			in.gbsIDs_org3 = pairing.getG1().newElement();
+			in.gbsIDs_org4 = pairing.getG1().newElement();
+			in.gbsIDs_org5 = pairing.getG1().newElement();
+			in.gbsIDs_org6 = pairing.getG1().newElement();
+			in.sID_org1 = pairing.getZr().newElement();
+			in.sID_org2 = pairing.getZr().newElement();
+			in.sID_org3 = pairing.getZr().newElement();
+			in.sID_org4 = pairing.getZr().newElement();
+			in.sID_org5 = pairing.getZr().newElement();
+			in.sID_org6 = pairing.getZr().newElement();
+			in.sIDr_org1 = pairing.getZr().newElement();
+			in.sIDr_org2 = pairing.getZr().newElement();
+			in.sIDr_org3 = pairing.getZr().newElement();
+			in.sIDr_org4 = pairing.getZr().newElement();
+			in.sIDr_org5 = pairing.getZr().newElement();
+			in.sIDr_org6 = pairing.getZr().newElement();
+			in.hb1 = pairing.getG1().newElement();
+			in.hb2 = pairing.getG1().newElement();
+			in.hb3 = pairing.getG1().newElement();
+			in.hb4 = pairing.getG1().newElement();
+			in.hb5 = pairing.getG1().newElement();
+			in.hb6 = pairing.getG1().newElement();
+			in.hb7 = pairing.getG1().newElement();
+			in.hb8 = pairing.getG1().newElement();
+			in.hb9 = pairing.getG1().newElement();
+			in.hb10 = pairing.getG1().newElement();
+			in.hbb1 = pairing.getG1().newElement();
+			in.hbb2 = pairing.getG1().newElement();
+			in.hbb3 = pairing.getG1().newElement();
+			in.hbb4 = pairing.getG1().newElement();
+			in.hbb5 = pairing.getG1().newElement();
+			in.hbb6 = pairing.getG1().newElement();
+			in.hbb7 = pairing.getG1().newElement();
+			in.hbb8 = pairing.getG1().newElement();
+			in.hbb9 = pairing.getG1().newElement();
+			in.hbb10 = pairing.getG1().newElement();
 
+			offset += 4;
+			offset = unserializeElement(b, offset, in.g1);
+			offset = unserializeElement(b, offset, in.g1b);
+			offset = unserializeElement(b, offset, in.g1bb);
+			offset = unserializeElement(b, offset, in.g2);
+			offset = unserializeElement(b, offset, in.g2b);
+			offset = unserializeElement(b, offset, in.e_gg_alpha);
+			offset = unserializeElement(b, offset, in.h1);
+			offset = unserializeElement(b, offset, in.h2);
+			offset = unserializeElement(b, offset, in.h3);
+			offset = unserializeElement(b, offset, in.h4);
+			offset = unserializeElement(b, offset, in.h5);
+			offset = unserializeElement(b, offset, in.h6);
+			offset = unserializeElement(b, offset, in.h7);
+			offset = unserializeElement(b, offset, in.h8);
+			offset = unserializeElement(b, offset, in.h9);
+			offset = unserializeElement(b, offset, in.h10);
+			offset = unserializeElement(b, offset, in.gsIDs_org1);
+			offset = unserializeElement(b, offset, in.gsIDs_org2);
+			offset = unserializeElement(b, offset, in.gsIDs_org3);
+			offset = unserializeElement(b, offset, in.gsIDs_org4);
+			offset = unserializeElement(b, offset, in.gsIDs_org5);
+			offset = unserializeElement(b, offset, in.gsIDs_org6);
+			offset = unserializeElement(b, offset, in.gbsIDs_org1);
+			offset = unserializeElement(b, offset, in.gbsIDs_org2);
+			offset = unserializeElement(b, offset, in.gbsIDs_org3);
+			offset = unserializeElement(b, offset, in.gbsIDs_org4);
+			offset = unserializeElement(b, offset, in.gbsIDs_org5);
+			offset = unserializeElement(b, offset, in.gbsIDs_org6);
+			offset = unserializeElement(b, offset, in.sID_org1);
+			offset = unserializeElement(b, offset, in.sID_org2);
+			offset = unserializeElement(b, offset, in.sID_org3);
+			offset = unserializeElement(b, offset, in.sID_org4);
+			offset = unserializeElement(b, offset, in.sID_org5);
+			offset = unserializeElement(b, offset, in.sID_org6);
+			offset = unserializeElement(b, offset, in.sIDr_org1);
+			offset = unserializeElement(b, offset, in.sIDr_org2);
+			offset = unserializeElement(b, offset, in.sIDr_org3);
+			offset = unserializeElement(b, offset, in.sIDr_org4);
+			offset = unserializeElement(b, offset, in.sIDr_org5);
+			offset = unserializeElement(b, offset, in.sIDr_org6);
+			offset = unserializeElement(b, offset, in.hb1);
+			offset = unserializeElement(b, offset, in.hb2);
+			offset = unserializeElement(b, offset, in.hb3);
+			offset = unserializeElement(b, offset, in.hb4);
+			offset = unserializeElement(b, offset, in.hb5);
+			offset = unserializeElement(b, offset, in.hb6);
+			offset = unserializeElement(b, offset, in.hb7);
+			offset = unserializeElement(b, offset, in.hb8);
+			offset = unserializeElement(b, offset, in.hb9);
+			offset = unserializeElement(b, offset, in.hb10);
+			offset = unserializeElement(b, offset, in.hbb1);
+			offset = unserializeElement(b, offset, in.hbb2);
+			offset = unserializeElement(b, offset, in.hbb3);
+			offset = unserializeElement(b, offset, in.hbb4);
+			offset = unserializeElement(b, offset, in.hbb5);
+			offset = unserializeElement(b, offset, in.hbb6);
+			offset = unserializeElement(b, offset, in.hbb7);
+			offset = unserializeElement(b, offset, in.hbb8);
+			offset = unserializeElement(b, offset, in.hbb9);
+			offset = unserializeElement(b, offset, in.hbb10);
+
+			pub.Ircpabe_comp.add(in);
+		}
 		return pub;
 	}
 
@@ -157,7 +311,10 @@ public class SerializeUtils {
 	
 		serializeElement(arrlist, msk.beta);
 		serializeElement(arrlist, msk.g_alpha);
-		serializeElement(arrlist, msk.s);
+
+		serializeElement(arrlist, msk.b_new);
+		serializeElement(arrlist, msk.s_new);
+		serializeElement(arrlist, msk.alpha);
 
 		return Byte_arr2byte_arr(arrlist);
 	}
@@ -169,12 +326,16 @@ public class SerializeUtils {
 	
 		msk.beta = pub.p.getZr().newElement();
 		msk.g_alpha = pub.p.getG2().newElement();
-		msk.s = pub.p.getZr().newElement();
+		msk.b_new = pub.p.getZr().newElement();
+		msk.s_new = pub.p.getZr().newElement();
+		msk.alpha = pub.p.getGT().newElement();
 
 		offset = unserializeElement(b, offset, msk.beta);
 		offset = unserializeElement(b, offset, msk.g_alpha);
-		offset = unserializeElement(b, offset, msk.s);
 
+		offset = unserializeElement(b, offset, msk.b_new);
+		offset = unserializeElement(b, offset, msk.s_new);
+		offset = unserializeElement(b, offset, msk.alpha);
 		return msk;
 	}
 
@@ -193,7 +354,6 @@ public class SerializeUtils {
 			serializeElement(arrlist, prv.comps.get(i).d);
 			serializeElement(arrlist, prv.comps.get(i).dp);
 		}
-	
 		return Byte_arr2byte_arr(arrlist);
 	}
 
@@ -300,8 +460,7 @@ public class SerializeUtils {
 		}
 	}
 
-	private static BswabePolicy unserializePolicy(BswabePub pub, byte[] arr,
-			int[] offset) {
+	private static BswabePolicy unserializePolicy(BswabePub pub, byte[] arr, int[] offset) {
 		int i;
 		int n;
 		BswabePolicy p = new BswabePolicy();

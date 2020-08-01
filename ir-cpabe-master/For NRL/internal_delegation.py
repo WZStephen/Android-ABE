@@ -50,8 +50,7 @@ def main():
 		# revoked authorities
 		non_revIDlist_a = ['org1', 'org2', 'org3']
 			
-		cpabe.encrypt( "pk.param", symk, access_policy, 
-			revIDlist_u, non_revIDlist_a, ctxt_filename)
+		cpabe.encrypt("pk.param", symk, access_policy, revIDlist_u, non_revIDlist_a, ctxt_filename)
 			
 		rec_msg = cpabe.decrypt_file(ctxt_filename, key_file_child)
 

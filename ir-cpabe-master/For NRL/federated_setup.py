@@ -16,7 +16,6 @@ def main():
 	ta_pk_filenames = ta_conf['TApubs']
 
 	# org tree structure
-	root_org = "org1"
 	root = Node("org1")
 	org2 = Node("org2", parent = root)
 	org3 = Node("org3", parent = root)
@@ -27,7 +26,7 @@ def main():
 	print(Fore.BLUE + RenderTree(root, style=AsciiStyle()).by_attr())
 	print(Style.RESET_ALL)
 
-	# each TA first generate theri own public key and msk key
+	# each TA first generate their own public key and msk key
 	for ta in TAset:
 		cpabe.ta_setup_tree(ta_pk_filenames[ta], ta_msk_filenames[ta], root)
 
@@ -35,8 +34,7 @@ def main():
 	for i in range(1, len(TAset)):
 		ta_first = "ta" + str(i)
 		ta_second = "ta" + str(i+1)
-		cpabe.federated_setup1(ta_pk_filenames[ta_first], ta_pk_filenames[ta_second], 
-			ta_msk_filenames[ta_second], root)
+		cpabe.federated_setup1(ta_pk_filenames[ta_first], ta_pk_filenames[ta_second], ta_msk_filenames[ta_second], root)
 	
 	command = "cp {} {}".format(ta_pk_filenames[TAset[-1]], "pk.param")
 	print("command is ", command)

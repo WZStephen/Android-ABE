@@ -107,7 +107,6 @@ public class MainActivity extends Activity {
 
 
         //encrypt button handler
-
         enc_button.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -147,7 +146,6 @@ public class MainActivity extends Activity {
                         Toast.makeText(MainActivity.this, "insert success", Toast.LENGTH_LONG).show();
                     } else{
                         Toast.makeText(MainActivity.this, "insert failed", Toast.LENGTH_LONG).show();
-
                     }
                 }
                 else{
@@ -232,9 +230,9 @@ public class MainActivity extends Activity {
         mskfile_ta1 = MainActivity.this.getFilesDir() + "/master_keys/ta1.msk";
         mskfile_ta2 = MainActivity.this.getFilesDir() + "/master_keys/ta2.msk";
         mskfile_ta3 = MainActivity.this.getFilesDir() + "/master_keys/ta3.msk";
-        prvfile_ta1 = MainActivity.this.getFilesDir() + "/private_keys/ta1.sk";
-        prvfile_ta2 = MainActivity.this.getFilesDir() + "/private_keys/ta2.sk";
-        prvfile_ta3 = MainActivity.this.getFilesDir() + "/private_keys/ta3.sk";
+        prvfile_ta1 = MainActivity.this.getFilesDir() + "/private_keys/ta1.org.sk";
+        prvfile_ta2 = MainActivity.this.getFilesDir() + "/private_keys/ta2.org.sk";
+        prvfile_ta3 = MainActivity.this.getFilesDir() + "/private_keys/ta3.org.sk";
         String[] TAs = new String[]{"ta1", "ta2", "ta3"};
         String[] ta_pk_filenames = new String[]{pubfile_ta1, pubfile_ta2, pubfile_ta3};
         String[] ta_msk_filenames = new String[]{mskfile_ta1, mskfile_ta2, mskfile_ta3};
@@ -264,14 +262,20 @@ public class MainActivity extends Activity {
 //        cpabe.setup(pubfile_ta2, mskfile_ta2); //keygen via pre-defined key paths(testing)
 //        cpabe.setup(pubfile_ta3, mskfile_ta3); //keygen via pre-defined key paths(testing)
 
+        //federated_setup
         Node root = cpabe.treeStruc(); //a root node contains all the child node in the tree
         for(int i = 0; i < TAs.length; i++){
-            cpabe.ta_setup_tree(ta_pk_filenames[i], ta_msk_filenames[i], root);
+            cpabe.ta_setup_tree(ta_pk_filenames[i], ta_msk_filenames[i], ta_sk_filenames[i], root);
         }
-        for(int i = 0; i < TAs.length; i++) {
-            cpabe.federated_setup1(ta_pk_filenames[i], ta_pk_filenames[i], ta_msk_filenames[0], root);
+        for(int i = 0; i < TAs.length-1; i++) {
+            cpabe.federated_setup1(ta_pk_filenames[i], ta_pk_filenames[i+1], ta_msk_filenames[i+1], root);
         }
 
+        //federated_keygen
+        String[] attr_assigned = attr_dict;
+        for(int i = 0; i < TAs.length; i++){
+            cpabe.org_keygen(attr_assigned, root, ta_msk_filenames[i], ta_pk_filenames[i], ta_sk_filenames[i]);
+        }
 
         //generate public key and corresponding private keys
         //cpabe.keygen(pubfile, prvfile, mskfile, attr_dict);

@@ -2,19 +2,19 @@ package com.cpabe.abe_lib.bsw;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import it.unisa.dia.gas.jpbc.CurveParameters;
 import it.unisa.dia.gas.jpbc.Element;
 import it.unisa.dia.gas.jpbc.Pairing;
-import it.unisa.dia.gas.plaf.jpbc.field.z.ZrElement;
 import it.unisa.dia.gas.plaf.jpbc.pairing.DefaultCurveParameters;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 
@@ -75,7 +75,8 @@ public class Bswabe {
 		Pairing pairing = pub.p;
 
 		Element g1 = pairing.getG1().newRandomElement();
-		Element g2 = pairing.getG2().newElement().setToRandom();
+		Element g2 = pairing.getG2().newRandomElement();
+
 		Element h_new_1 = pairing.getG1().newElement().setToRandom();
 		Element h_new_2 = pairing.getG1().newElement().setToRandom();
 		Element h_new_3 = pairing.getG1().newElement().setToRandom();
@@ -103,6 +104,7 @@ public class Bswabe {
 
 		return gp;
 	}
+
 	public static void ta_setup_tree(BswabePub pub, BswabeMsk msk, Node root, HashMap<String, Element> gp) throws NoSuchAlgorithmException {
 		Element alpha, beta_inv;
 		CurveParameters params = new DefaultCurveParameters().load(new ByteArrayInputStream(curveParams.getBytes()));
@@ -137,13 +139,9 @@ public class Bswabe {
 		pub.g_hat_alpha = pairing.pairing(pub.g, msk.g_alpha);
 
 		//---------------integrate key with root node information during keygen---------------------
-		alpha = pairing.getZr().newElement().setToRandom();
+		alpha = pairing.getGT().newRandomElement();
 		Element b = pairing.getZr().newElement().setToRandom().getImmutable();
 		Element s = pairing.getZr().newElement().setToRandom().getImmutable();
-
-		//new msk key structure
-		msk.s = s;
-		msk.beta = b;
 
 		//added new pub key structure
 		Element ZR = pairing.getZr().newElement();
@@ -168,84 +166,414 @@ public class Bswabe {
 		Element g1_alpha = g1.powZn(alpha).getImmutable();
 
 		//new pub key structure
-		pub.g1 = g1;
-		pub.g2 = g2;
-		pub.g2b = g2b;
-		pub.g1b = g1b;
-		pub.g1bb = g1bb;
-		pub.e_gg_alpha = pairing.pairing(g1_alpha, g2);
-		pub.h_new_1 = gp.get("h1");
-		pub.h_new_2 = gp.get("h2");
-		pub.h_new_3 = gp.get("h3");
-		pub.h_new_4 = gp.get("h4");
-		pub.h_new_5 = gp.get("h5");
-		pub.h_new_6 = gp.get("h6");
-		pub.h_new_7 = gp.get("h7");
-		pub.h_new_8 = gp.get("h8");
-		pub.h_new_9 = gp.get("h9");
-		pub.h_new_10 = gp.get("h10");
-		pub.hb1 = h1.powZn(b);
-		pub.hbb1 = h1.powZn(b.mul(b));
-		pub.hb2 = h2.powZn(b);
-		pub.hbb2 = h2.powZn(b.mul(b));
-		pub.hb3 = h3.powZn(b);
-		pub.hbb3 = h3.powZn(b.mul(b));
-		pub.hb4 = h4.powZn(b);
-		pub.hbb4 = h4.powZn(b.mul(b));
-		pub.hb5 = h5.powZn(b);
-		pub.hbb5 = h5.powZn(b.mul(b));
-		pub.hb6 = h6.powZn(b);
-		pub.hbb6 = h6.powZn(b.mul(b));
-		pub.hb7 = h7.powZn(b);
-		pub.hbb7 = h7.powZn(b.mul(b));
-		pub.hb8 = h8.powZn(b);
-		pub.hbb8 = h8.powZn(b.mul(b));
-		pub.hb9 = h9.powZn(b);
-		pub.hbb9 = h9.powZn(b.mul(b));
-		pub.hb10 = h10.powZn(b);
-		pub.hbb10 = h10.powZn(b.mul(b));
+		pub.Ircpabe_comp = new ArrayList<>();
+		Ircpabe in = new Ircpabe();
+		in.g1 = g1;
+		in.g2 = g2;
+		in.g2b = g2b;
+		in.g1b = g1b;
+		in.g1bb = g1bb;
+		for(int i = 1; i <= 10; i++){
+			String index = "h" + i;
+			Insert_Ircpabe(index, gp.get(index), in);
+		}
 
-		pub.sID_org1 = elementFromString_rev(root.getValue(), ZR).powZn(s).getImmutable();
-		pub.sIDr_org1 = pub.sID_org1.duplicate().invert().getImmutable();
-		pub.sID_org2 = elementFromString_rev(all_orgs[1], pairing.getZr().newElement()).powZn(pub.sID_org1).getImmutable();
-		pub.sIDr_org2 = pub.sID_org2.duplicate().invert().getImmutable();
-		pub.sID_org3 = elementFromString_rev(all_orgs[2], pairing.getZr().newElement()).powZn(pub.sID_org1).getImmutable();
-		pub.sIDr_org3 = pub.sID_org3.duplicate().invert().getImmutable();
-		pub.sID_org4 = elementFromString_rev(all_orgs[3], pairing.getZr().newElement()).powZn(pub.sID_org1).getImmutable();
-		pub.sIDr_org4 = pub.sID_org4.duplicate().invert().getImmutable();
-		pub.sID_org5 = elementFromString_rev(all_orgs[4], pairing.getZr().newElement()).powZn(pub.sID_org2).getImmutable();
-		pub.sIDr_org5 = pub.sID_org5.duplicate().invert().getImmutable();
-		pub.sID_org6 = elementFromString_rev(all_orgs[5], pairing.getZr().newElement()).powZn(pub.sID_org2).getImmutable();
-		pub.sIDr_org6 = pub.sID_org6.duplicate().invert().getImmutable();
+		for(int i = 1; i <= 10; i++){
+			String h_index = "h" + i;
+			String hb_index = "hb" + i;
+			String hbb_index1 = "hbb" + i;
 
-		pub.gsIDs_org1 = g2.powZn(pub.sIDr_org1);
-		pub.gbsIDs_org1 = g2b.powZn(pub.sIDr_org1);
-		pub.gsIDs_org2 = g2.powZn(pub.sIDr_org2);
-		pub.gbsIDs_org2 = g2b.powZn(pub.sIDr_org2);
-		pub.gsIDs_org3 = g2.powZn(pub.sIDr_org3);
-		pub.gbsIDs_org3 = g2b.powZn(pub.sIDr_org3);
-		pub.gsIDs_org4 = g2.powZn(pub.sIDr_org4);
-		pub.gbsIDs_org4 = g2b.powZn(pub.sIDr_org4);
-		pub.gsIDs_org5 = g2.powZn(pub.sIDr_org5);
-		pub.gbsIDs_org5 = g2b.powZn(pub.sIDr_org5);
-		pub.gsIDs_org6 = g2.powZn(pub.sIDr_org6);
-		pub.gbsIDs_org6 = g2b.powZn(pub.sIDr_org6);
+			Element hb_current  =gp.get(h_index).getImmutable().powZn(b);
+			Element hbb_current  =gp.get(h_index).getImmutable().powZn(b.mul(b));
+
+			Insert_Ircpabe(hb_index, hb_current, in);
+			Insert_Ircpabe(hbb_index1, hbb_current, in);
+		}
+
+		in.sID_org1 = elementFromString_rev(root.getValue(), ZR).powZn(s).getImmutable();
+		in.sIDr_org1 = in.sID_org1.duplicate().invert().getImmutable();
+		in.sID_org2 = elementFromString_rev(all_orgs[1], pairing.getZr().newElement()).powZn(in.sID_org1).getImmutable();
+		in.sIDr_org2 = in.sID_org2.duplicate().invert().getImmutable();
+		in.sID_org3 = elementFromString_rev(all_orgs[2], pairing.getZr().newElement()).powZn(in.sID_org1).getImmutable();
+		in.sIDr_org3 = in.sID_org3.duplicate().invert().getImmutable();
+		in.sID_org4 = elementFromString_rev(all_orgs[3], pairing.getZr().newElement()).powZn(in.sID_org1).getImmutable();
+		in.sIDr_org4 = in.sID_org4.duplicate().invert().getImmutable();
+		in.sID_org5 = elementFromString_rev(all_orgs[4], pairing.getZr().newElement()).powZn(in.sID_org2).getImmutable();
+		in.sIDr_org5 = in.sID_org5.duplicate().invert().getImmutable();
+		in.sID_org6 = elementFromString_rev(all_orgs[5], pairing.getZr().newElement()).powZn(in.sID_org2).getImmutable();
+		in.sIDr_org6 = in.sID_org6.duplicate().invert().getImmutable();
+
+		for(int i = 1; i <= 6; i++){
+			String gsIDs_index = "gsIDs_org"+i;
+			String gbsIDs_index = "gbsIDs_org" + i;
+
+			Element sIDr_current = Get_Ircpabe("sIDr_org"+i, in);
+
+			Insert_Ircpabe(gsIDs_index, g2.powZn(sIDr_current), in);
+			Insert_Ircpabe(gbsIDs_index, g2b.powZn(sIDr_current), in);
+		}
+		in.e_gg_alpha = pairing.pairing(g1_alpha, g2);
+
+		pub.Ircpabe_comp.add(in);
+
+		//new msk key structure
+		msk.s_new = s;
+		msk.b_new = b;
+		msk.alpha = g1.powZn(alpha);
 	}
-	public static void setupGP(){
 
-	}
-	public static void federated_setup1(BswabePub pub1, BswabePub pub2,BswabeMsk msk2, Node root) throws NoSuchAlgorithmException {
+	public static void federated_setup1(BswabePub pub1, BswabePub pub2,BswabeMsk msk2, Node root, HashMap<String, Element> gp) throws NoSuchAlgorithmException {
+		CurveParameters params = new DefaultCurveParameters().load(new ByteArrayInputStream(curveParams.getBytes()));
+		pub1.pairingDesc = curveParams;
+		pub1.p = PairingFactory.getPairing(params);
+		Pairing pairing = pub1.p;
+
+		Element ZR = pairing.getZr().newElement();
+
 		String[] all_orgs = new String[]{"org1", "org2", "org3", "org4", "org5", "org6"};
-		Element b = msk2.beta;
-		Element alpha = msk2.g_alpha;
-		Element s = msk2.s;
+		Element b = msk2.b_new;
+		Element alpha = msk2.alpha;
+		Element s = msk2.s_new;
 
-		Element g2b = pub1.gp.powZn(b);
-		Element g1b = pub1.g.powZn(b);
-		Element g1bb = pub1.h.powZn(b);
-		Element e_gg_alpha = pub1.g_hat_alpha;
+		Element g2b = pub1.Ircpabe_comp.get(0).g2b.powZn(b);
+		Element g1b = pub1.Ircpabe_comp.get(0).g1b.powZn(b);
+		Element g1bb = pub1.Ircpabe_comp.get(0).g1bb.powZn(b);
+		Element e_gg_alpha = pub1.Ircpabe_comp.get(0).e_gg_alpha.mul(pairing.pairing(gp.get("g1"), gp.get("g2")).powZn(alpha));
+
+		Element hb1 = pub1.Ircpabe_comp.get(0).hb1.powZn(b);
+		Element hbb1 = pub1.Ircpabe_comp.get(0).hbb1.powZn(b.mul(b));
+		Element hb2 = pub1.Ircpabe_comp.get(0).hb2.powZn(b);
+		Element hbb2 = pub1.Ircpabe_comp.get(0).hbb2.powZn(b.mul(b));
+		Element hb3 = pub1.Ircpabe_comp.get(0).hb3.powZn(b);
+		Element hbb3 = pub1.Ircpabe_comp.get(0).hbb3.powZn(b.mul(b));
+		Element hb4 = pub1.Ircpabe_comp.get(0).hb4.powZn(b);
+		Element hbb4 = pub1.Ircpabe_comp.get(0).hbb4.powZn(b.mul(b));
+		Element hb5 = pub1.Ircpabe_comp.get(0).hb5.powZn(b);
+		Element hbb5 = pub1.Ircpabe_comp.get(0).hbb5.powZn(b.mul(b));
+		Element hb6 = pub1.Ircpabe_comp.get(0).hb6.powZn(b);
+		Element hbb6 = pub1.Ircpabe_comp.get(0).hbb6.powZn(b.mul(b));
+		Element hb7 = pub1.Ircpabe_comp.get(0).hb7.powZn(b);
+		Element hbb7 = pub1.Ircpabe_comp.get(0).hbb7.powZn(b.mul(b));
+		Element hb8 = pub1.Ircpabe_comp.get(0).hb8.powZn(b);
+		Element hbb8 = pub1.Ircpabe_comp.get(0).hbb8.powZn(b.mul(b));
+		Element hb9 = pub1.Ircpabe_comp.get(0).hb9.powZn(b);
+		Element hbb9 = pub1.Ircpabe_comp.get(0).hbb9.powZn(b.mul(b));
+		Element hb10 = pub1.Ircpabe_comp.get(0).hb10.powZn(b);
+		Element hbb10 = pub1.Ircpabe_comp.get(0).hbb10.powZn(b.mul(b));
+
+		Element sID_org1 = pub1.Ircpabe_comp.get(0).sID_org1.mul(elementFromString_rev(root.getValue(), ZR).powZn(s).getImmutable());
+		Element sIDr_org1 = sID_org1.invert();
+		Element sID_org2 = pub1.Ircpabe_comp.get(0).sID_org2.mul(elementFromString_rev(root.getValue(), ZR).powZn(sID_org1).getImmutable());
+		Element sIDr_org2 = sID_org2.invert();
+		Element sID_org3 = pub1.Ircpabe_comp.get(0).sID_org3.mul(elementFromString_rev(root.getValue(), ZR).powZn(sID_org1).getImmutable());
+		Element sIDr_org3 = sID_org3.invert();
+		Element sID_org4 = pub1.Ircpabe_comp.get(0).sID_org4.mul(elementFromString_rev(root.getValue(), ZR).powZn(sID_org1).getImmutable());
+		Element sIDr_org4 = sID_org4.invert();
+		Element sID_org5 = pub1.Ircpabe_comp.get(0).sID_org5.mul(elementFromString_rev(root.getValue(), ZR).powZn(sID_org2).getImmutable());
+		Element sIDr_org5 = sID_org5.invert();
+		Element sID_org6 = pub1.Ircpabe_comp.get(0).sID_org6.mul(elementFromString_rev(root.getValue(), ZR).powZn(sID_org2).getImmutable());
+		Element sIDr_org6 = sID_org6.invert();
+
+		Element gsIDs_org1 = pub1.Ircpabe_comp.get(0).g2.powZn(sIDr_org1);
+		Element gbsIDs_org1 = pub1.Ircpabe_comp.get(0).g2b.powZn(sIDr_org1);
+		Element gsIDs_org2 = pub1.Ircpabe_comp.get(0).g2.powZn(sIDr_org2);
+		Element gbsIDs_org2 = pub1.Ircpabe_comp.get(0).g2b.powZn(sIDr_org2);
+		Element gsIDs_org3 = pub1.Ircpabe_comp.get(0).g2.powZn(sIDr_org3);
+		Element gbsIDs_org3 = pub1.Ircpabe_comp.get(0).g2b.powZn(sIDr_org3);
+		Element gsIDs_org4 = pub1.Ircpabe_comp.get(0).g2.powZn(sIDr_org4);
+		Element gbsIDs_org4 = pub1.Ircpabe_comp.get(0).g2b.powZn(sIDr_org4);
+		Element gsIDs_org5 = pub1.Ircpabe_comp.get(0).g2.powZn(sIDr_org5);
+		Element gbsIDs_org5 = pub1.Ircpabe_comp.get(0).g2b.powZn(sIDr_org5);
+		Element gsIDs_org6 = pub1.Ircpabe_comp.get(0).g2.powZn(sIDr_org6);
+		Element gbsIDs_org6 = pub1.Ircpabe_comp.get(0).g2b.powZn(sIDr_org6);
+
+		//federated public keygen
+		pub2.Ircpabe_comp = new ArrayList<>();
+		Ircpabe in_pub2 = new Ircpabe();
+		in_pub2.g1 = pub1.Ircpabe_comp.get(0).g1;
+		in_pub2.g2 = pub1.Ircpabe_comp.get(0).g2;
+		in_pub2.g2b = g2b;
+		in_pub2.g1b = g1b;
+		in_pub2.g1bb = g1bb;
+
+		in_pub2.e_gg_alpha = e_gg_alpha;
+		for(int i = 1; i <= 10; i++){
+			String h_index = "h" + i;
+			Element pub1_h_index = Get_Ircpabe(h_index, pub1.Ircpabe_comp.get(0));
+			Insert_Ircpabe(h_index, pub1_h_index, in_pub2);
+		}
+
+		in_pub2.hb1 = hb1;
+		in_pub2.hb2 = hb2;
+		in_pub2.hb3 = hb3;
+		in_pub2.hb4 = hb4;
+		in_pub2.hb5 = hb5;
+		in_pub2.hb6 = hb6;
+		in_pub2.hb7 = hb7;
+		in_pub2.hb8 = hb8;
+		in_pub2.hb9 = hb9;
+		in_pub2.hb10 = hb10;
+		in_pub2.hbb1 = hbb1;
+		in_pub2.hbb2 = hbb2;
+		in_pub2.hbb3 = hbb3;
+		in_pub2.hbb4 = hbb4;
+		in_pub2.hbb5 = hbb5;
+		in_pub2.hbb6 = hbb6;
+		in_pub2.hbb7 = hbb7;
+		in_pub2.hbb8 = hbb8;
+		in_pub2.hbb9 = hbb9;
+		in_pub2.hbb10 = hbb10;
+		in_pub2.gsIDs_org1 = gsIDs_org1;
+		in_pub2.gsIDs_org2 = gsIDs_org2;
+		in_pub2.gsIDs_org3 = gsIDs_org3;
+		in_pub2.gsIDs_org4 = gsIDs_org4;
+		in_pub2.gsIDs_org5 = gsIDs_org5;
+		in_pub2.gsIDs_org6 = gsIDs_org6;
+		in_pub2.gbsIDs_org1 = gbsIDs_org1;
+		in_pub2.gbsIDs_org2 = gbsIDs_org2;
+		in_pub2.gbsIDs_org3 = gbsIDs_org3;
+		in_pub2.gbsIDs_org4 = gbsIDs_org4;
+		in_pub2.gbsIDs_org5 = gbsIDs_org5;
+		in_pub2.gbsIDs_org6 = gbsIDs_org6;
+		in_pub2.sID_org1 = sID_org1;
+		in_pub2.sID_org2 = sID_org2;
+		in_pub2.sID_org3 = sID_org3;
+		in_pub2.sID_org4 = sID_org4;
+		in_pub2.sID_org5 = sID_org5;
+		in_pub2.sID_org6 = sID_org6;
+		in_pub2.sIDr_org1 = sIDr_org1;
+		in_pub2.sIDr_org2 = sIDr_org2;
+		in_pub2.sIDr_org3 = sIDr_org3;
+		in_pub2.sIDr_org4 = sIDr_org4;
+		in_pub2.sIDr_org5 = sIDr_org5;
+		in_pub2.sIDr_org6 = sIDr_org6;
+
+		pub2.Ircpabe_comp.add(in_pub2);
 	}
-		/*
+
+	public static void org_keygen(String[] attr_assigned, Node root, BswabeMsk msk,BswabePub pub, BswabePrv prv, HashMap<String, Element> gp) throws NoSuchAlgorithmException {
+		CurveParameters params = new DefaultCurveParameters().load(new ByteArrayInputStream(curveParams.getBytes()));
+		pub.pairingDesc = curveParams;
+		pub.p = PairingFactory.getPairing(params);
+		Pairing pairing = pub.p;
+
+		Element alpha = msk.alpha;
+		Element g1 = pub.Ircpabe_comp.get(0).g1;
+		Element g1b = pub.Ircpabe_comp.get(0).g1b;
+		Element g2 = pub.Ircpabe_comp.get(0).g2;
+		Element g2b = pub.Ircpabe_comp.get(0).g2b;
+		Element g1bb = pub.Ircpabe_comp.get(0).g1bb;
+		Element h1 = pub.Ircpabe_comp.get(0).h1;
+		Element h2 = pub.Ircpabe_comp.get(0).h2;
+		Element h3 = pub.Ircpabe_comp.get(0).h3;
+		Element h4 = pub.Ircpabe_comp.get(0).h4;
+		Element h5 = pub.Ircpabe_comp.get(0).h5;
+		Element h6 = pub.Ircpabe_comp.get(0).h6;
+		Element h7 = pub.Ircpabe_comp.get(0).h7;
+		Element h8 = pub.Ircpabe_comp.get(0).h8;
+		Element h9 = pub.Ircpabe_comp.get(0).h9;
+		Element h10 = pub.Ircpabe_comp.get(0).h10;
+		Element hb1 = pub.Ircpabe_comp.get(0).hb1;
+		Element hb2 = pub.Ircpabe_comp.get(0).hb2;
+		Element hb3 = pub.Ircpabe_comp.get(0).hb3;
+		Element hb4 = pub.Ircpabe_comp.get(0).hb4;
+		Element hb5 = pub.Ircpabe_comp.get(0).hb5;
+		Element hb6 = pub.Ircpabe_comp.get(0).hb6;
+		Element hb7 = pub.Ircpabe_comp.get(0).hb7;
+		Element hb8 = pub.Ircpabe_comp.get(0).hb8;
+		Element hb9 = pub.Ircpabe_comp.get(0).hb9;
+		Element hb10 = pub.Ircpabe_comp.get(0).hb10;
+		Element gbsIDs_org1 = pub.Ircpabe_comp.get(0).gbsIDs_org1;
+		Element gbsIDs_org2 = pub.Ircpabe_comp.get(0).gbsIDs_org2;
+		Element gbsIDs_org3 = pub.Ircpabe_comp.get(0).gbsIDs_org3;
+		Element gbsIDs_org4 = pub.Ircpabe_comp.get(0).gbsIDs_org4;
+		Element gbsIDs_org5 = pub.Ircpabe_comp.get(0).gbsIDs_org5;
+		Element gbsIDs_org6 = pub.Ircpabe_comp.get(0).gbsIDs_org6;
+		Element gsIDs_org1 = pub.Ircpabe_comp.get(0).gsIDs_org1;
+		Element gsIDs_org2 = pub.Ircpabe_comp.get(0).gsIDs_org2;
+		Element gsIDs_org3 = pub.Ircpabe_comp.get(0).gsIDs_org3;
+		Element gsIDs_org4 = pub.Ircpabe_comp.get(0).gsIDs_org4;
+		Element gsIDs_org5 = pub.Ircpabe_comp.get(0).gsIDs_org5;
+		Element gsIDs_org6 = pub.Ircpabe_comp.get(0).gsIDs_org6;
+
+		Element t = pairing.getZr().newRandomElement();
+		Element sID = pub.Ircpabe_comp.get(0).sID_org1.getImmutable();
+		Element sIDr = sID.invert().getImmutable();
+
+		Element K0 = (g1.powZn(alpha)).mul(g1bb.powZn(t));
+
+		Element Lu = (g2.powZn(t)).invert();
+		Element La = (g2.powZn(sIDr.mul(t)));
+
+		Element gbsID = g1b.powZn(sID);
+		Element gbt = g1b.powZn(t);
+
+		prv.Ka_comp = new ArrayList<>();
+		prv.Kastr_comp = new ArrayList<>();
+		prv.Ku_comp = new ArrayList<>();
+		prv.Kustr_comp = new ArrayList<>();
+		prv.hx_comp = new ArrayList<>();
+		prv.hstr_comp = new ArrayList<>();
+		prv.ht_comp = new ArrayList<>();
+		prv.htstr_comp = new ArrayList<>();
+		prv.hbt_comp = new ArrayList<>();
+		prv.hbtstr_comp = new ArrayList<>();
+
+		Ka ka = new Ka();
+		Kastr kastr = new Kastr();
+		Ku ku = new Ku();
+		Kustr kustr = new Kustr();
+		hx hx = new hx();
+		hstr hstr = new hstr();
+		ht ht = new ht();
+		htstr htstr = new htstr();
+		hbt hbt = new hbt();
+		hbtstr hbtstr = new hbtstr();
+
+		for(int i=1; i<=10; i++){
+			if (i == 1){
+				ka.attr1 = g1b.powZn(sID).mul(hb1).powZn(t);
+				kastr.attr1 = objectToBytes(ka.attr1);
+				ku.attr1 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h1)).powZn(t);
+				kustr.attr1 = objectToBytes(ku.attr1);
+				hx.attr1 = h1;
+				hstr.attr1 = objectToBytes(hx.attr1);
+				ht.attr1 = hx.attr1.powZn(t);
+				htstr.attr1 = objectToBytes(ht.attr1);
+				hbt.attr1 = hb1.powZn(t);
+				hbtstr.attr1 = objectToBytes(hbt.attr1);
+
+			}else if(i == 2){
+				ka.attr2 = g1b.powZn(sID).mul(hb2).powZn(t);
+				kastr.attr2 = objectToBytes(ka.attr2);
+				ku.attr2 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h2)).powZn(t);
+				kustr.attr2 = objectToBytes(ku.attr2);
+				hx.attr2 = h2;
+				hstr.attr2 = objectToBytes(hx.attr2);
+				ht.attr2 = hx.attr2.powZn(t);
+				htstr.attr2 = objectToBytes(ht.attr2);
+				hbt.attr2 = hb2.powZn(t);
+				hbtstr.attr2 = objectToBytes(hbt.attr2);
+
+			}else if(i == 3){
+				ka.attr3 = g1b.powZn(sID).mul(hb3).powZn(t);
+				kastr.attr3 = objectToBytes(ka.attr3);
+				ku.attr3 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h3)).powZn(t);
+				kustr.attr3 = objectToBytes(ku.attr3);
+				hx.attr3 = h3;
+				hstr.attr3 = objectToBytes(hx.attr3);
+				ht.attr3 = hx.attr3.powZn(t);
+				htstr.attr3 = objectToBytes(ht.attr3);
+				hbt.attr3 = hb3.powZn(t);
+				hbtstr.attr3 = objectToBytes(hbt.attr3);
+
+			}else if(i == 4){
+				ka.attr4 = g1b.powZn(sID).mul(hb4).powZn(t);
+				kastr.attr4 = objectToBytes(ka.attr4);
+				ku.attr4 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h4)).powZn(t);
+				kustr.attr4 = objectToBytes(ku.attr4);
+				hx.attr4 = h4;
+				hstr.attr4 = objectToBytes(hx.attr4);
+				ht.attr4 = hx.attr4.powZn(t);
+				htstr.attr4 = objectToBytes(ht.attr4);
+				hbt.attr4 = hb4.powZn(t);
+				hbtstr.attr4 = objectToBytes(hbt.attr4);
+
+			}else if(i == 5){
+				ka.attr5 = g1b.powZn(sID).mul(hb5).powZn(t);
+				kastr.attr5 = objectToBytes(ka.attr5);
+				ku.attr5 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h5)).powZn(t);
+				kustr.attr5 = objectToBytes(ku.attr5);
+				hx.attr5 = h5;
+				hstr.attr5 = objectToBytes(hx.attr5);
+				ht.attr5 = hx.attr5.powZn(t);
+				htstr.attr5 = objectToBytes(ht.attr5);
+				hbt.attr5 = hb5.powZn(t);
+				hbtstr.attr5 = objectToBytes(hbt.attr5);
+
+			}else if(i == 6){
+				ka.attr6 = g1b.powZn(sID).mul(hb6).powZn(t);
+				kastr.attr6 = objectToBytes(ka.attr6);
+				ku.attr6 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h6)).powZn(t);
+				kustr.attr6 = objectToBytes(ku.attr6);
+				hx.attr6 = h6;
+				hstr.attr6 = objectToBytes(hx.attr6);
+				ht.attr6 = hx.attr6.powZn(t);
+				htstr.attr6 = objectToBytes(ht.attr6);
+				hbt.attr6 = hb6.powZn(t);
+				hbtstr.attr6 = objectToBytes(hbt.attr6);
+
+			}else if(i == 7){
+				ka.attr7 = g1b.powZn(sID).mul(hb7).powZn(t);
+				kastr.attr7 = objectToBytes(ka.attr7);
+				ku.attr7 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h7)).powZn(t);
+				kustr.attr7 = objectToBytes(ku.attr7);
+				hx.attr7 = h7;
+				hstr.attr7 = objectToBytes(hx.attr7);
+				ht.attr7 = hx.attr7.powZn(t);
+				htstr.attr7 = objectToBytes(ht.attr7);
+				hbt.attr7 = hb7.powZn(t);
+				hbtstr.attr7 = objectToBytes(hbt.attr7);
+
+			}else if(i == 8){
+				ka.attr8 = g1b.powZn(sID).mul(hb8).powZn(t);
+				kastr.attr8 = objectToBytes(ka.attr8);
+				ku.attr8 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h8)).powZn(t);
+				kustr.attr8 = objectToBytes(ku.attr8);
+				hx.attr8 = h8;
+				hstr.attr8 = objectToBytes(hx.attr8);
+				ht.attr8 = hx.attr8.powZn(t);
+				htstr.attr8 = objectToBytes(ht.attr8);
+				hbt.attr8 = hb8.powZn(t);
+				hbtstr.attr8 = objectToBytes(hbt.attr8);
+
+			}else if(i == 9){
+				ka.attr9 = g1b.powZn(sID).mul(hb9).powZn(t);
+				kastr.attr9 = objectToBytes(ka.attr9);
+				ku.attr9 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h9)).powZn(t);
+				kustr.attr9 = objectToBytes(ku.attr9);
+				hx.attr9 = h9;
+				hstr.attr9 = objectToBytes(hx.attr9);
+				ht.attr9 = hx.attr9.powZn(t);
+				htstr.attr9 = objectToBytes(ht.attr9);
+				hbt.attr9 = hb9.powZn(t);
+				hbtstr.attr9 = objectToBytes(hbt.attr9);
+
+			}else {
+				ka.attr10 = g1b.powZn(sID).mul(hb10).powZn(t);
+				kastr.attr10 = objectToBytes(ka.attr10);
+				ku.attr10 = ((g1b.powZn(elementFromString_rev("org1", pairing.getZr().newRandomElement()))).mul(h10)).powZn(t);
+				kustr.attr10 = objectToBytes(ku.attr10);
+				hx.attr10 = h10;
+				hstr.attr10 = objectToBytes(hx.attr10);
+				ht.attr10 = hx.attr10.powZn(t);
+				htstr.attr10 = objectToBytes(ht.attr10);
+				hbt.attr10 = hb10.powZn(t);
+				hbtstr.attr10 = objectToBytes(hbt.attr10);
+			}
+		}
+		prv.Ka_comp.add(ka);
+		prv.Kastr_comp.add(kastr);
+		prv.Ku_comp.add(ku);
+		prv.Kustr_comp.add(kustr);
+		prv.hx_comp.add(hx);
+		prv.hstr_comp.add(hstr);
+		prv.ht_comp.add(ht);
+		prv.htstr_comp.add(htstr);
+		prv.hbt_comp.add(hbt);
+		prv.hbtstr_comp.add(hbtstr);
+
+		prv.K0 = K0;
+		prv.Lu = Lu;
+		prv.La = La;
+		prv.sID = sID;
+		prv.gbsID = gbsID;
+		prv.gbt = gbt;
+		prv.ID = "org1";
+		prv.org_id = "org1";
+	}
+
+	 /*
 	 * Generate a private key with the given set of attributes.
 	 */
 	public static BswabePrv keygen(BswabePub pub, BswabeMsk msk, String[] attrs) throws NoSuchAlgorithmException {
@@ -788,5 +1116,331 @@ public class Bswabe {
 			return	k < l ? -1 : 
 					k == l ? 0 : 1;
 		}
+	}
+
+	public static void Insert_Ircpabe(String index, Element ele, Ircpabe obj){
+		switch (index) {
+			case "g1":
+				obj.g1 = ele;
+				break;
+			case "g1b":
+				obj.g1b = ele;
+				break;
+			case "g1bb":
+				obj.g1bb = ele;
+				break;
+			case "g2":
+				obj.g2 = ele;
+				break;
+			case "g2b":
+				obj.g2b = ele;
+				break;
+			case "e_gg_alpha":
+				obj.e_gg_alpha = ele;
+				break;
+			case "h1":
+				obj.h1 = ele;
+				break;
+			case "h2":
+				obj.h2 = ele;
+				break;
+			case "h3":
+				obj.h3 = ele;
+				break;
+			case "h4":
+				obj.h4 = ele;
+				break;
+			case "h5":
+				obj.h5 = ele;
+				break;
+			case "h6":
+				obj.h6 = ele;
+				break;
+			case "h7":
+				obj.h7 = ele;
+				break;
+			case "h8":
+				obj.h8 = ele;
+				break;
+			case "h9":
+				obj.h9 = ele;
+				break;
+			case "h10":
+				obj.h10 = ele;
+				break;
+			case "gsIDs_org1":
+				obj.gsIDs_org1 = ele;
+				break;
+			case "gsIDs_org2":
+				obj.gsIDs_org2 = ele;
+				break;
+			case "gsIDs_org3":
+				obj.gsIDs_org3 = ele;
+				break;
+			case "gsIDs_org4":
+				obj.gsIDs_org4 = ele;
+				break;
+			case "gsIDs_org5":
+				obj.gsIDs_org5 = ele;
+				break;
+			case "gsIDs_org6":
+				obj.gsIDs_org6 = ele;
+				break;
+			case "gbsIDs_org1":
+				obj.gbsIDs_org1 = ele;
+				break;
+			case "gbsIDs_org2":
+				obj.gbsIDs_org2 = ele;
+				break;
+			case "gbsIDs_org3":
+				obj.gbsIDs_org3 = ele;
+				break;
+			case "gbsIDs_org4":
+				obj.gbsIDs_org4 = ele;
+				break;
+			case "gbsIDs_org5":
+				obj.gbsIDs_org5 = ele;
+				break;
+			case "gbsIDs_org6":
+				obj.gbsIDs_org6 = ele;
+				break;
+			case "sID_org1":
+				obj.sID_org1 = ele;
+				break;
+			case "sID_org2":
+				obj.sID_org2 = ele;
+				break;
+			case "sID_org3":
+				obj.sID_org3 = ele;
+				break;
+			case "sID_org4":
+				obj.sID_org4 = ele;
+				break;
+			case "sID_org5":
+				obj.sID_org5 = ele;
+				break;
+			case "sID_org6":
+				obj.sID_org6 = ele;
+				break;
+			case "sIDr_org1":
+				obj.sIDr_org1 = ele;
+				break;
+			case "sIDr_org2":
+				obj.sIDr_org2 = ele;
+				break;
+			case "sIDr_org3":
+				obj.sIDr_org3 = ele;
+				break;
+			case "sIDr_org4":
+				obj.sIDr_org4 = ele;
+				break;
+			case "sIDr_org5":
+				obj.sIDr_org5 = ele;
+				break;
+			case "sIDr_org6":
+				obj.sIDr_org6 = ele;
+				break;
+			case "hb1":
+				obj.hb1 = ele;
+				break;
+			case "hb2":
+				obj.hb2 = ele;
+				break;
+			case "hb3":
+				obj.hb3 = ele;
+				break;
+			case "hb4":
+				obj.hb4 = ele;
+				break;
+			case "hb5":
+				obj.hb5 = ele;
+				break;
+			case "hb6":
+				obj.hb6 = ele;
+				break;
+			case "hb7":
+				obj.hb7 = ele;
+				break;
+			case "hb8":
+				obj.hb8 = ele;
+				break;
+			case "hb9":
+				obj.hb9 = ele;
+				break;
+			case "hb10":
+				obj.hb10 = ele;
+				break;
+			case "hbb1":
+				obj.hbb1 = ele;
+				break;
+			case "hbb2":
+				obj.hbb2 = ele;
+				break;
+			case "hbb3":
+				obj.hbb3 = ele;
+				break;
+			case "hbb4":
+				obj.hbb4 = ele;
+				break;
+			case "hbb5":
+				obj.hbb5 = ele;
+				break;
+			case "hbb6":
+				obj.hbb6 = ele;
+				break;
+			case "hbb7":
+				obj.hbb7 = ele;
+				break;
+			case "hbb8":
+				obj.hbb8 = ele;
+				break;
+			case "hbb9":
+				obj.hbb9 = ele;
+				break;
+			case "hbb10":
+				obj.hbb10 = ele;
+				break;
+		}
+	}
+
+	public static Element Get_Ircpabe(String index, Ircpabe obj){
+		switch (index) {
+			case "g1":
+				return obj.g1;
+			case "g1b":
+				return obj.g1b;
+			case "g1bb":
+				return obj.g1bb;
+			case "g2":
+				return obj.g2;
+			case "g2b":
+				return obj.g2b;
+			case "e_gg_alpha":
+				return obj.e_gg_alpha;
+			case "h1":
+				return obj.h1;
+			case "h2":
+				return obj.h2;
+			case "h3":
+				return obj.h3;
+			case "h4":
+				return obj.h4;
+			case "h5":
+				return obj.h5;
+			case "h6":
+				return obj.h6;
+			case "h7":
+				return obj.h7;
+			case "h8":
+				return obj.h8;
+			case "h9":
+				return obj.h9;
+			case "h10":
+				return obj.h10;
+			case "gsIDs_org1":
+				return obj.gsIDs_org1;
+			case "gsIDs_org2":
+				return obj.gsIDs_org2;
+			case "gsIDs_org3":
+				return obj.gsIDs_org3;
+			case "gsIDs_org4":
+				return obj.gsIDs_org4;
+			case "gsIDs_org5":
+				return obj.gsIDs_org5;
+			case "gsIDs_org6":
+				return obj.gsIDs_org6;
+			case "gbsIDs_org1":
+				return obj.gbsIDs_org1;
+			case "gbsIDs_org2":
+				return obj.gbsIDs_org2;
+			case "gbsIDs_org3":
+				return obj.gbsIDs_org3;
+			case "gbsIDs_org4":
+				return obj.gbsIDs_org4;
+			case "gbsIDs_org5":
+				return obj.gbsIDs_org5;
+			case "gbsIDs_org6":
+				return obj.gbsIDs_org6;
+			case "sID_org1":
+				return obj.sID_org1;
+			case "sID_org2":
+				return obj.sID_org2;
+			case "sID_org3":
+				return obj.sID_org3;
+			case "sID_org4":
+				return obj.sID_org4;
+			case "sID_org5":
+				return obj.sID_org5;
+			case "sID_org6":
+				return obj.sID_org6;
+			case "sIDr_org1":
+				return obj.sIDr_org1;
+			case "sIDr_org2":
+				return obj.sIDr_org2;
+			case "sIDr_org3":
+				return obj.sIDr_org3;
+			case "sIDr_org4":
+				return obj.sIDr_org4;
+			case "sIDr_org5":
+				return obj.sIDr_org5;
+			case "sIDr_org6":
+				return obj.sIDr_org6;
+			case "hb1":
+				return obj.hb1;
+			case "hb2":
+				return obj.hb2;
+			case "hb3":
+				return obj.hb3;
+			case "hb4":
+				return obj.hb4;
+			case "hb5":
+				return obj.hb5;
+			case "hb6":
+				return obj.hb6;
+			case "hb7":
+				return obj.hb7;
+			case "hb8":
+				return obj.hb8;
+			case "hb9":
+				return obj.hb9;
+			case "hb10":
+				return obj.hb10;
+			case "hbb1":
+				return obj.hbb1;
+			case "hbb2":
+				return obj.hbb2;
+			case "hbb3":
+				return obj.hbb3;
+			case "hbb4":
+				return obj.hbb4;
+			case "hbb5":
+				return obj.hbb5;
+			case "hbb6":
+				return obj.hbb6;
+			case "hbb7":
+				return obj.hbb7;
+			case "hbb8":
+				return obj.hbb8;
+			case "hbb9":
+				return obj.hbb9;
+			case "hbb10":
+				return obj.hbb10;
+		}
+		return null;
+	}
+
+	public static byte[] objectToBytes(Element ele){
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream out = null;
+		byte[] yourBytes = new byte[0];
+		try {
+			out = new ObjectOutputStream(bos);
+			out.writeObject(ele);
+			out.flush();
+			yourBytes = bos.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return yourBytes;
 	}
 }
