@@ -387,11 +387,33 @@ public class SerializeUtils {
 	
 			prv.comps.add(c);
 		}
-	
 		return prv;
 	}
 
-	public static byte[] bswabeCphSerialize(BswabeCph cph) {
+	public static byte[] serializeIrcpabePrv(BswabePrv prv) {
+		ArrayList<Byte> arrlist;
+		int prvCompsLen, i;
+		arrlist = new ArrayList<Byte>();
+		prvCompsLen = prv.comps.size();
+
+		serializeElement(arrlist, prv.d);
+		serializeElement(arrlist, prv.K0);
+		serializeElement(arrlist, prv.Lu);
+		serializeElement(arrlist, prv.La);
+
+		serializeUint32(arrlist, prvCompsLen);
+
+		for (i = 0; i < prvCompsLen; i++) {
+			serializeString(arrlist, prv.comps.get(i).attr);
+			serializeElement(arrlist, prv.comps.get(i).d);
+			serializeElement(arrlist, prv.comps.get(i).dp);
+		}
+		return Byte_arr2byte_arr(arrlist);
+	}
+
+
+
+		public static byte[] bswabeCphSerialize(BswabeCph cph) {
 		ArrayList<Byte> arrlist = new ArrayList<Byte>();
 		SerializeUtils.serializeElement(arrlist, cph.cs);
 		SerializeUtils.serializeElement(arrlist, cph.c);

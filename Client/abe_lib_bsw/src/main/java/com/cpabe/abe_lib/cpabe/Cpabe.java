@@ -240,5 +240,7 @@ public class Cpabe {
 		prv = SerializeUtils.unserializeBswabePrv(pub, prv_byte);
 
 		Bswabe.org_keygen(attr_assigned, root, msk, pub, prv, gp);
+		prv_byte = SerializeUtils.serializeIrcpabePrv(prv);
+
 	}
 }
