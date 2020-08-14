@@ -442,7 +442,6 @@ public class Bswabe {
 				htstr.attr1 = objectToBytes(ht.attr1);
 				hbt.attr1 = hb1.powZn(t);
 				hbtstr.attr1 = objectToBytes(hbt.attr1);
-
 			}else if(i == 2){
 				ka.attr2 = g1b.powZn(sID).mul(hb2).powZn(t);
 				kastr.attr2 = objectToBytes(ka.attr2);
@@ -454,7 +453,6 @@ public class Bswabe {
 				htstr.attr2 = objectToBytes(ht.attr2);
 				hbt.attr2 = hb2.powZn(t);
 				hbtstr.attr2 = objectToBytes(hbt.attr2);
-
 			}else if(i == 3){
 				ka.attr3 = g1b.powZn(sID).mul(hb3).powZn(t);
 				kastr.attr3 = objectToBytes(ka.attr3);
@@ -466,7 +464,6 @@ public class Bswabe {
 				htstr.attr3 = objectToBytes(ht.attr3);
 				hbt.attr3 = hb3.powZn(t);
 				hbtstr.attr3 = objectToBytes(hbt.attr3);
-
 			}else if(i == 4){
 				ka.attr4 = g1b.powZn(sID).mul(hb4).powZn(t);
 				kastr.attr4 = objectToBytes(ka.attr4);
@@ -478,7 +475,6 @@ public class Bswabe {
 				htstr.attr4 = objectToBytes(ht.attr4);
 				hbt.attr4 = hb4.powZn(t);
 				hbtstr.attr4 = objectToBytes(hbt.attr4);
-
 			}else if(i == 5){
 				ka.attr5 = g1b.powZn(sID).mul(hb5).powZn(t);
 				kastr.attr5 = objectToBytes(ka.attr5);
@@ -490,7 +486,6 @@ public class Bswabe {
 				htstr.attr5 = objectToBytes(ht.attr5);
 				hbt.attr5 = hb5.powZn(t);
 				hbtstr.attr5 = objectToBytes(hbt.attr5);
-
 			}else if(i == 6){
 				ka.attr6 = g1b.powZn(sID).mul(hb6).powZn(t);
 				kastr.attr6 = objectToBytes(ka.attr6);
@@ -502,7 +497,6 @@ public class Bswabe {
 				htstr.attr6 = objectToBytes(ht.attr6);
 				hbt.attr6 = hb6.powZn(t);
 				hbtstr.attr6 = objectToBytes(hbt.attr6);
-
 			}else if(i == 7){
 				ka.attr7 = g1b.powZn(sID).mul(hb7).powZn(t);
 				kastr.attr7 = objectToBytes(ka.attr7);
@@ -514,7 +508,6 @@ public class Bswabe {
 				htstr.attr7 = objectToBytes(ht.attr7);
 				hbt.attr7 = hb7.powZn(t);
 				hbtstr.attr7 = objectToBytes(hbt.attr7);
-
 			}else if(i == 8){
 				ka.attr8 = g1b.powZn(sID).mul(hb8).powZn(t);
 				kastr.attr8 = objectToBytes(ka.attr8);
@@ -526,7 +519,6 @@ public class Bswabe {
 				htstr.attr8 = objectToBytes(ht.attr8);
 				hbt.attr8 = hb8.powZn(t);
 				hbtstr.attr8 = objectToBytes(hbt.attr8);
-
 			}else if(i == 9){
 				ka.attr9 = g1b.powZn(sID).mul(hb9).powZn(t);
 				kastr.attr9 = objectToBytes(ka.attr9);
@@ -538,7 +530,6 @@ public class Bswabe {
 				htstr.attr9 = objectToBytes(ht.attr9);
 				hbt.attr9 = hb9.powZn(t);
 				hbtstr.attr9 = objectToBytes(hbt.attr9);
-
 			}else {
 				ka.attr10 = g1b.powZn(sID).mul(hb10).powZn(t);
 				kastr.attr10 = objectToBytes(ka.attr10);
@@ -573,7 +564,11 @@ public class Bswabe {
 		prv.org_id = "org1";
 	}
 
-	 /*
+	public static void federated_org_keygen(String ID, String attr_list, BswabeMsk ta_msk_file_second, BswabePub pk_file, BswabePrv ta_sk_file_first, BswabePrv ta_sk_file_second, String org_id){
+
+	}
+
+	/*
 	 * Generate a private key with the given set of attributes.
 	 */
 	public static BswabePrv keygen(BswabePub pub, BswabeMsk msk, String[] attrs) throws NoSuchAlgorithmException {
@@ -1092,6 +1087,7 @@ public class Bswabe {
 		byte[] digest = md.digest(s.getBytes());
 		h.setFromHash(digest, 0, digest.length);
 	}
+
 	private static Element elementFromString_rev(String s, Element h) throws NoSuchAlgorithmException {
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 		byte[] digest = md.digest(s.getBytes());

@@ -240,7 +240,33 @@ public class Cpabe {
 		prv = SerializeUtils.unserializeBswabePrv(pub, prv_byte);
 
 		Bswabe.org_keygen(attr_assigned, root, msk, pub, prv, gp);
-		prv_byte = SerializeUtils.serializeIrcpabePrv(prv);
 
+		prv_byte = SerializeUtils.serializeIrcpabePrv(prv);
+		Common.spitFile(prvfile, prv_byte);
+	}
+
+	public void federated_org_keygen(String ID, String[] attr_list, String ta_msk_file_second, String pk_file, String ta_sk_file_first, String ta_sk_file_second, String org_id) throws IOException, ClassNotFoundException {
+		byte[] pub_byte;
+		byte[] msk_byte;
+		byte[] prv_byte_first;
+		byte[] prv_byte_second;
+
+
+		BswabeMsk msk_second;
+		BswabePub pub;
+		BswabePrv prv_first;
+		BswabePrv prv_second;
+
+		pub_byte = Common.suckFile(pk_file);
+		pub = SerializeUtils.unserializeBswabePub(pub_byte);
+
+		msk_byte = Common.suckFile(ta_msk_file_second);
+		msk_second = SerializeUtils.unserializeBswabeMsk(pub, msk_byte);
+
+		prv_byte_first = Common.suckFile(ta_sk_file_first);
+		prv_first = SerializeUtils.unserializeIrcpabePrv(pub, prv_byte_first);
+
+		prv_byte_second = Common.suckFile(ta_sk_file_second);
+		prv_second = SerializeUtils.unserializeIrcpabePrv(pub, prv_byte_second);
 	}
 }

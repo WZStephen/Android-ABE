@@ -392,28 +392,148 @@ public class SerializeUtils {
 
 	public static byte[] serializeIrcpabePrv(BswabePrv prv) {
 		ArrayList<Byte> arrlist;
-		int prvCompsLen, i;
 		arrlist = new ArrayList<Byte>();
-		prvCompsLen = prv.comps.size();
+
+		int prvCompsLen = prv.comps.size();
+		int KaLen = prv.Ka_comp.size();
+		int KuLen = prv.Ku_comp.size();
+		int HxLen = prv.hx_comp.size();
+		int HtLen = prv.ht_comp.size();
+		int HbtLen = prv.hbt_comp.size();
 
 		serializeElement(arrlist, prv.d);
 		serializeElement(arrlist, prv.K0);
 		serializeElement(arrlist, prv.Lu);
 		serializeElement(arrlist, prv.La);
 
+
 		serializeUint32(arrlist, prvCompsLen);
 
-		for (i = 0; i < prvCompsLen; i++) {
+		for (int i = 0; i < prvCompsLen; i++) {
 			serializeString(arrlist, prv.comps.get(i).attr);
 			serializeElement(arrlist, prv.comps.get(i).d);
 			serializeElement(arrlist, prv.comps.get(i).dp);
 		}
+
+		for (int i = 0; i < KaLen; i++) {
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr1);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr2);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr3);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr4);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr5);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr6);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr7);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr8);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr9);
+			serializeElement(arrlist, prv.Ka_comp.get(i).attr10);
+		}
+
+		for (int i = 0; i < KuLen; i++) {
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr1);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr2);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr3);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr4);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr5);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr6);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr7);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr8);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr9);
+			serializeElement(arrlist, prv.Ku_comp.get(i).attr10);
+		}
+
+		for (int i = 0; i < HxLen; i++) {
+			serializeElement(arrlist, prv.hx_comp.get(i).attr1);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr2);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr3);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr4);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr5);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr6);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr7);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr8);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr9);
+			serializeElement(arrlist, prv.hx_comp.get(i).attr10);
+		}
+
+		for (int i = 0; i < HtLen; i++) {
+			serializeElement(arrlist, prv.ht_comp.get(i).attr1);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr2);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr3);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr4);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr5);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr6);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr7);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr8);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr9);
+			serializeElement(arrlist, prv.ht_comp.get(i).attr10);
+		}
+
+		for (int i = 0; i < HbtLen; i++) {
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr1);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr2);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr3);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr4);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr5);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr6);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr7);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr8);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr9);
+			serializeElement(arrlist, prv.hbt_comp.get(i).attr10);
+		}
 		return Byte_arr2byte_arr(arrlist);
 	}
 
+	public static BswabePrv unserializeIrcpabePrv(BswabePub pub, byte[] b){
+		BswabePrv prv = new BswabePrv();
+		int offset = 0;
+		int len;
 
+		prv.d = pub.p.getG2().newElement();
+		offset = unserializeElement(b, offset, prv.d);
 
-		public static byte[] bswabeCphSerialize(BswabeCph cph) {
+		prv.comps = new ArrayList<BswabePrvComp>();
+		len = unserializeUint32(b, offset);
+		offset += 4;
+
+		prv.Ka_comp = new ArrayList<Ka>();
+		len = unserializeUint32(b, offset);
+		offset += 4;
+
+		prv.Ku_comp = new ArrayList<Ku>();
+		len = unserializeUint32(b, offset);
+		offset += 4;
+
+		prv.hx_comp = new ArrayList<hx>();
+		len = unserializeUint32(b, offset);
+		offset += 4;
+
+		prv.ht_comp = new ArrayList<ht>();
+		len = unserializeUint32(b, offset);
+		offset += 4;
+
+		prv.hbt_comp = new ArrayList<hbt>();
+		len = unserializeUint32(b, offset);
+		offset += 4;
+
+		for (int i = 0; i < len; i++) {
+			BswabePrvComp c = new BswabePrvComp();
+
+			StringBuffer sb = new StringBuffer("");
+			offset = unserializeString(b, offset, sb);
+			c.attr = sb.substring(0);
+
+			c.d = pub.p.getG2().newElement();
+			c.dp = pub.p.getG2().newElement();
+
+			offset = unserializeElement(b, offset, c.d);
+			offset = unserializeElement(b, offset, c.dp);
+
+			prv.comps.add(c);
+		}
+
+		return prv;
+
+	}
+	public static byte[] bswabeCphSerialize(BswabeCph cph) {
 		ArrayList<Byte> arrlist = new ArrayList<Byte>();
 		SerializeUtils.serializeElement(arrlist, cph.cs);
 		SerializeUtils.serializeElement(arrlist, cph.c);

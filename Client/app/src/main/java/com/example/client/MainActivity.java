@@ -277,6 +277,11 @@ public class MainActivity extends Activity {
             cpabe.org_keygen(attr_assigned, root, ta_msk_filenames[i], ta_pk_filenames[i], ta_sk_filenames[i]);
         }
 
+        for(int i = 1; i <= TAs.length; i++) {
+            cpabe.federated_org_keygen("org1", attr_assigned, ta_msk_filenames[i+1], ta_pk_filenames[i],ta_sk_filenames[i],ta_sk_filenames[i+1], "org1");
+        }
+
+
         //generate public key and corresponding private keys
         //cpabe.keygen(pubfile, prvfile, mskfile, attr_dict);
         cpabe.keygen(pubfile_ta1, prvfile_ta1, mskfile_ta1, attr_dict);
