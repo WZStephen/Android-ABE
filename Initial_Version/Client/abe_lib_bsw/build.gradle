@@ -1,0 +1,54 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+//    implementation files('libs/commons-logging-1.2.jar')
+//    implementation files('libs/Jama-1.0.3.jar')
+//    implementation files('libs/log4j-1.2.17.jar')
+//    implementation files('libs/slf4j-api-1.7.12.jar')
+//    implementation files('libs/slf4j-log4j12-1.7.12.jar')
+//    compile 'com.alibaba:fastjson:1.1.59.android'
+
+    implementation files('libs/jpbc-api-1.2.1.jar')
+    implementation files('libs/jpbc-plaf-1.2.1.jar')
+}
+task clearJar(type: Delete) {
+    delete "${project.buildDir}/libs/"
+}
+//打包debug版本的jar包及arr包
+task makeDebugJarAndArr(type: Copy) {
+    from("${project.buildDir}/intermediates/bundles/debug/", "${project.buildDir}/outputs/aar/")
+    into("${project.buildDir}/libs/debug/")
+    include('classes.jar', "$project.archivesBaseName-debug.aar")
+    // rename('classes.jar', "")
+    // rename("$project.archivesBaseName-debug.aar", aarNameDebug)
+}
+makeDebugJarAndArr.dependsOn(clearJar, build)

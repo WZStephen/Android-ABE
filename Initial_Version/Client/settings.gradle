@@ -1,0 +1,4 @@
+rootProject.name='Client'
+include ':app'
+include ':abe_lib_cloud'
+include ':abe_lib_bsw'
