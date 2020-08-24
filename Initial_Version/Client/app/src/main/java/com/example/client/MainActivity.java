@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v){
                 try {
-                    //开始进行解密
+                    //Start to decrypt
                     boolean flag_dec;
                     flag_dec = abe_decrypt(get_priv_key_name.getText().toString());
 
@@ -136,10 +136,10 @@ public class MainActivity extends Activity {
 
     //ABE encrypt method
     private String abe_encrypt() throws Exception{
-        //待加密文件路径
+        //File path to be encrypted
         inputfile = MainActivity.this.getFilesDir() + "/input.txt";
 
-        //密钥存储路径
+        //Keys path
         pubfile   = MainActivity.this.getFilesDir() + "/public_keys/ta1.pk";
         mskfile   = MainActivity.this.getFilesDir() + "/master_keys/ta1.msk";
         prvfile   = MainActivity.this.getFilesDir() + "/private_keys/ta1.sk";
@@ -147,21 +147,21 @@ public class MainActivity extends Activity {
 
         //prvfile2  = MainActivity.this.getFilesDir() + "/bsw_environment/private_keys/ta2.sk";
 
-        //加密解密文件存储路径
+        //Encrypted file path
         encfile =  MainActivity.this.getFilesDir() + "/input.txt.enc";
         del_enc_file =  MainActivity.this.getFilesDir() + "/input.txt.del.enc";
 
 
         decfile = MainActivity.this.getFilesDir() + "/input.txt.dec";
 
-        //设置全球公钥属性
+        //Set global attribute
         String[] attribute = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
-        //设置委派密钥属性
+        //delegate the private key for testing the functionality of delegation
         String[] attr_delegate_ok = {"1", "2", "3", "4"};
         //String[] attr_delegate_ko = {"11", "12"};
 
-        //设置私钥属性和加密策略
+        //Set private key encryption policy
         String policy =
                 "1 2 2of2 " +
                 "2 3 2of2 " +
@@ -169,19 +169,18 @@ public class MainActivity extends Activity {
                 "5 6 2of2 " +
                 "1of4";
 
-        //生成密钥文件
+        //Generate keys files
         cpabe.setup(pubfile, mskfile);
 
-        //生成公钥和对应密钥1
+        //Generate public key and corresponding private key
         cpabe.keygen(pubfile, prvfile, mskfile, attribute);
 
-        //委派密钥(添加子集)
+        //delegation (add subset)
         cpabe.delegate(prvfile_delegate, attr_delegate_ok);
 
-        //加密
-        //cpabe.enc(pubfile, policy, inputfile, encfile);
-
-        cpabe.enc(pubfile, policy, inputfile, del_enc_file);
+        //encryption
+        //cpabe.enc(pubfile, policy, inputfile, encfile); //normal encryption
+        cpabe.enc(pubfile, policy, inputfile, del_enc_file); //encrypt with delegated key
 
         return "Success, enc file is stored at \n" + encfile +
                 "\n\n The attribute is \n" + "{\"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"10\"}" +
