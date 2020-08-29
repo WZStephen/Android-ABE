@@ -466,9 +466,7 @@ public class SerializeUtils {
 			ka.ele = pub.p.getG2().newElement();
 			offset = unserializeElement(b, offset, ka.ele);
 		}
-
 		return prv;
-
 	}
 	public static byte[] bswabeCphSerialize(BswabeCph cph) {
 		ArrayList<Byte> arrlist = new ArrayList<Byte>();

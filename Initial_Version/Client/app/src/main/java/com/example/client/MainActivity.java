@@ -169,6 +169,7 @@ public class MainActivity extends Activity {
                 "5 6 2of2 " +
                 "1of4";
 
+
         //Generate keys files
         cpabe.setup(pubfile, mskfile);
 
